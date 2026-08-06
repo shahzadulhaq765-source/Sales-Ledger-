@@ -81,7 +81,13 @@
       <label>Brand / Company<input id="prodBrand" placeholder="Optional"/></label>
       <label>Packing<input id="prodPacking" placeholder="12 × 1kg"/></label>
       <label>Carton Weight (KG)<input id="prodWeight" type="number" step="0.001" placeholder="12"/></label>
-      <label>Current Rate / Ton<input id="prodRate" type="number" step="0.01" placeholder="245000"/></label>
+      <label>Pieces per Carton<input id="prodPieces" type="number" step="1" placeholder="12"/></label>
+      <label>Price Basis<select id="prodPriceBasis"><option value="piece">Per Piece</option><option value="ton">Per Ton</option></select></label>
+      <label>Current Selling Rate<input id="prodRate" type="number" step="0.01" placeholder="250"/></label>
+      <label>TP Price per Pc<input id="prodTpPrice" type="number" step="0.01" placeholder="Optional for SSSAP"/></label>
+      <label>Atlas Price per Pc (Optional)<input id="prodAtlasPrice" type="number" step="0.01"/></label>
+      <label>SSS Price per Pc (Optional)<input id="prodSssPrice" type="number" step="0.01"/></label>
+      <label>Approval Expire Date (Optional)<input id="prodApprovalExpiry" type="date"/></label>
     </div>
     <div class="actions"><button id="saveProduct" class="btn gold">Save Product</button><button id="cancelProductEdit" class="btn ghost hidden">Cancel Edit</button></div>
   </div>
@@ -118,12 +124,12 @@
       <div class="form-grid">
         <label>Product<select id="lineProduct"></select></label>
         <label>Cartons<input id="lineCartons" type="number" min="1" step="1"/></label>
-        <label>Rate / Ton<input id="lineRate" type="number" step="0.01"/></label>
+        <label id="lineRateLabel">Rate per Piece<input id="lineRate" type="number" step="0.01"/></label>
       </div>
       <div id="linePreview" class="hint"></div>
       <button id="addLine" class="btn outline">Add SKU</button>
     </div>
-    <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Packing</th><th>Cartons</th><th>KG/Ctn</th><th>Total KG</th><th>Tons</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceLines"></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Packing</th><th>Cartons</th><th>Pcs/Ctn</th><th>Total Pcs</th><th>KG/Ctn</th><th>Total KG</th><th>Tons</th><th>Rate Basis</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceLines"></tbody></table></div>
     <div class="invoice-totals"><div>Total Cartons <b id="invCartons">0</b></div><div>Total Tonnage <b id="invTon">0.000</b></div><div>Grand Total <b id="invTotal">Rs 0</b></div></div>
     <button id="saveInvoice" class="btn gold wide">Save Invoice</button>
   </div>
@@ -192,7 +198,12 @@
     <div class="actions">
       <button id="runReport" class="btn gold">Run Sales Report</button>
       <button id="runOutstanding" class="btn outline">Outstanding Report</button>
-      <button id="exportCsv" class="btn outline">Export Sales CSV</button>
+      <button id="runSssap" class="btn outline">SSSAP Report</button>
+      <button id="exportCsv" class="btn outline">Export Sales Excel</button>
+      <button id="exportSssapCsv" class="btn outline">Export SSSAP Excel</button>
+      <button id="exportOutstandingCsv" class="btn outline">Export Outstanding Excel</button>
+      <button id="printReport" class="btn outline">Print / Save PDF</button>
+      <button id="shareWhatsapp" class="btn outline">Share on WhatsApp</button>
       <button id="backupData" class="btn outline">Backup Data</button>
       <label class="upload compact">Restore Backup<input id="restoreData" type="file" accept=".json"/></label>
     </div>

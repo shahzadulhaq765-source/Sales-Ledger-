@@ -30,3 +30,21 @@
 
 ## Important
 Data is stored in the browser on the current device. Use **Backup Data** regularly and keep the downloaded JSON file safe.
+
+## Version 2 additions
+- Per-piece pricing with pieces per carton
+- Per-ton pricing retained
+- Sales and outstanding Excel/CSV export
+- Print / Save as PDF
+- WhatsApp report sharing
+
+## Version 3 additions
+- TP Price per Piece
+- Automatic SSSAP amount = net pieces × TP price
+- Automatic SSSAP tonnage from carton weight
+- SSSAP on-screen report
+- SSSAP Excel/CSV export
+- Optional Atlas Price per Pc
+- Optional SSS Price per Pc
+- Optional Approval Expire Date
+- Optional fields excluded from invoice and print/PDF, included in Excel exports
