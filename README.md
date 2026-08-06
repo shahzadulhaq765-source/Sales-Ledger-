@@ -1,32 +1,32 @@
-# Sales Ledger Android
+# SUH Sales Pro — Full PWA
 
-Modern offline Android app for customer-wise and SKU-wise sales, tonnage, payments and outstanding balances.
+## Included
+- Black & gold owner dashboard
+- Manual customer codes and product codes
+- Salesman master and customer assignment
+- Packing and carton weight per SKU
+- Cartons → KG → tonnage automatic calculation
+- Price updates with price-history records
+- Multi-SKU invoices
+- Manual invoice numbers
+- Delivery status, vehicle and driver
+- Payments and automatic outstanding
+- Sales returns that reduce sales, tonnage and outstanding
+- Company/customer/salesman monthly targets
+- Tonnage and amount target progress
+- Customer/product/salesman/date/status reports
+- CSV export
+- Customer opening outstanding CSV import
+- Local backup/restore
+- Offline PWA installation
 
-## GitHub se APK banana
-1. Is ZIP ko extract karein.
-2. Extracted folder ke andar ki **tamam files aur folders** GitHub repository ke root mein upload karein.
-3. Repository mein `.github`, `app`, `build.gradle.kts`, `settings.gradle.kts` nazar aane chahiye.
-4. GitHub ke **Actions** tab mein `Build Android APK` open karein.
-5. `Run workflow` dabayen.
-6. Green tick ke baad run open karke `SalesLedger-APK` artifact download karein.
-7. Download ZIP extract karein; us ke andar `app-debug.apk` install karein.
+## GitHub Pages
+1. Extract this ZIP.
+2. Upload all files to the root of your public GitHub repository.
+3. Settings → Pages → Deploy from a branch → main → /(root) → Save.
+4. Wait for the published site link.
+5. Open the site on Android Chrome.
+6. Chrome menu → Install app / Add to Home screen.
 
-## Features
-- Manual customer entry
-- Manual custom SKU code; auto serial numbering nahi
-- SKU code aur SKU name dono show hote hain
-- Date-wise sale entry
-- Amount = tonnage × price
-- Customer payments
-- Opening outstanding CSV import
-- Automatic outstanding calculation
-- Offline phone storage
-
-## Outstanding import
-Excel file ko CSV UTF-8 mein save karein:
-
-Customer Code,Customer Name,Outstanding Amount
-C001,Ahmed Traders,250000
-C002,Ali Enterprises,175500
-
-Minimum Android version: Android 8.0.
+## Important
+Data is stored in the browser on the current device. Use **Backup Data** regularly and keep the downloaded JSON file safe.

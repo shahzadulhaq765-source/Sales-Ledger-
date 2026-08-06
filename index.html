@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#090909"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <title>SUH Sales Pro</title>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logo">SUH</div><div><h1>SUH Sales Pro</h1><p>Distributor Sales Management</p></div></div>
+  <button id="installBtn" class="btn gold hidden">Install App</button>
+</header>
+
+<nav class="tabs">
+  <button data-tab="dashboard" class="active">Dashboard</button>
+  <button data-tab="customers">Customers</button>
+  <button data-tab="products">Products</button>
+  <button data-tab="salesmen">Salesmen</button>
+  <button data-tab="invoice">Invoice</button>
+  <button data-tab="payments">Payments</button>
+  <button data-tab="returns">Returns</button>
+  <button data-tab="targets">Targets</button>
+  <button data-tab="reports">Reports</button>
+</nav>
+
+<main>
+<section id="dashboard" class="tab active">
+  <div class="hero">
+    <div><span class="eyebrow">OWNER DASHBOARD</span><h2 id="dashDate"></h2><p>Live figures from this device</p></div>
+    <button class="btn outline" onclick="switchTab('invoice')">+ New Invoice</button>
+  </div>
+  <div class="grid cards six">
+    <div class="card"><span>Today Sales</span><strong id="todaySales">Rs 0</strong></div>
+    <div class="card"><span>Today Tonnage</span><strong id="todayTon">0.000</strong></div>
+    <div class="card"><span>Month Sales</span><strong id="monthSales">Rs 0</strong></div>
+    <div class="card"><span>Month Tonnage</span><strong id="monthTon">0.000</strong></div>
+    <div class="card danger"><span>Total Outstanding</span><strong id="totalOutstanding">Rs 0</strong></div>
+    <div class="card"><span>Month Collection</span><strong id="monthCollection">Rs 0</strong></div>
+  </div>
+  <div class="grid two">
+    <div class="panel"><h3>Monthly Targets</h3><div id="dashTargets"></div></div>
+    <div class="panel"><h3>Delivery Status</h3><div id="deliverySummary"></div></div>
+  </div>
+  <div class="grid two">
+    <div class="panel"><h3>Top Customers</h3><div id="topCustomers"></div></div>
+    <div class="panel"><h3>Top Products</h3><div id="topProducts"></div></div>
+  </div>
+  <div class="panel"><h3>Recent Invoices</h3><div id="recentInvoices"></div></div>
+</section>
+
+<section id="customers" class="tab">
+  <div class="panel">
+    <h2>Customer Master</h2>
+    <input type="hidden" id="custEdit"/>
+    <div class="form-grid">
+      <label>Customer Code<input id="custCode" inputmode="numeric" placeholder="9900001"/></label>
+      <label>Customer Name<input id="custName" placeholder="Ahmed Traders"/></label>
+      <label>Salesman<select id="custSalesman"></select></label>
+      <label>Phone<input id="custPhone" placeholder="Optional"/></label>
+      <label>Address<input id="custAddress" placeholder="Optional"/></label>
+      <label>Opening Outstanding<input id="custOpening" type="number" step="0.01" placeholder="0"/></label>
+    </div>
+    <div class="actions"><button id="saveCustomer" class="btn gold">Save Customer</button><button id="cancelCustomerEdit" class="btn ghost hidden">Cancel Edit</button></div>
+    <label class="upload">Import Customers / Opening Outstanding CSV<input id="importCustomers" type="file" accept=".csv"/></label>
+  </div>
+  <div class="panel"><div class="section-head"><h2>Customers</h2><input id="customerSearch" placeholder="Search code or name"/></div><div id="customerList"></div></div>
+</section>
+
+<section id="products" class="tab">
+  <div class="panel">
+    <h2>Product / SKU Master</h2>
+    <input type="hidden" id="prodEdit"/>
+    <div class="form-grid">
+      <label>Product Code<input id="prodCode" inputmode="numeric" placeholder="5124"/></label>
+      <label>Product Name<input id="prodName" placeholder="Mayonnaise"/></label>
+      <label>Brand / Company<input id="prodBrand" placeholder="Optional"/></label>
+      <label>Packing<input id="prodPacking" placeholder="12 × 1kg"/></label>
+      <label>Carton Weight (KG)<input id="prodWeight" type="number" step="0.001" placeholder="12"/></label>
+      <label>Current Rate / Ton<input id="prodRate" type="number" step="0.01" placeholder="245000"/></label>
+    </div>
+    <div class="actions"><button id="saveProduct" class="btn gold">Save Product</button><button id="cancelProductEdit" class="btn ghost hidden">Cancel Edit</button></div>
+  </div>
+  <div class="panel"><div class="section-head"><h2>Products</h2><input id="productSearch" placeholder="Search code or name"/></div><div id="productList"></div></div>
+</section>
+
+<section id="salesmen" class="tab">
+  <div class="panel">
+    <h2>Salesman Master</h2>
+    <div class="form-grid">
+      <label>Salesman Code<input id="smCode" placeholder="SM01"/></label>
+      <label>Salesman Name<input id="smName" placeholder="Ali"/></label>
+      <label>Phone<input id="smPhone" placeholder="Optional"/></label>
+    </div>
+    <button id="saveSalesman" class="btn gold">Save Salesman</button>
+  </div>
+  <div class="panel"><h2>Salesmen</h2><div id="salesmanList"></div></div>
+</section>
+
+<section id="invoice" class="tab">
+  <div class="panel">
+    <h2>New Multi-SKU Invoice</h2>
+    <div class="form-grid">
+      <label>Invoice No (Manual)<input id="invNo" placeholder="125478"/></label>
+      <label>Date<input id="invDate" type="date"/></label>
+      <label>Customer<select id="invCustomer"></select></label>
+      <label>Delivery Status<select id="invStatus"><option>Pending</option><option>Dispatched</option><option>Delivered</option><option>Cancelled</option></select></label>
+      <label>Vehicle No<input id="invVehicle" placeholder="Optional"/></label>
+      <label>Driver Name<input id="invDriver" placeholder="Optional"/></label>
+    </div>
+    <div id="customerOutstandingHint" class="hint"></div>
+    <div class="builder">
+      <h3>Add SKU Line</h3>
+      <div class="form-grid">
+        <label>Product<select id="lineProduct"></select></label>
+        <label>Cartons<input id="lineCartons" type="number" min="1" step="1"/></label>
+        <label>Rate / Ton<input id="lineRate" type="number" step="0.01"/></label>
+      </div>
+      <div id="linePreview" class="hint"></div>
+      <button id="addLine" class="btn outline">Add SKU</button>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Packing</th><th>Cartons</th><th>KG/Ctn</th><th>Total KG</th><th>Tons</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceLines"></tbody></table></div>
+    <div class="invoice-totals"><div>Total Cartons <b id="invCartons">0</b></div><div>Total Tonnage <b id="invTon">0.000</b></div><div>Grand Total <b id="invTotal">Rs 0</b></div></div>
+    <button id="saveInvoice" class="btn gold wide">Save Invoice</button>
+  </div>
+</section>
+
+<section id="payments" class="tab">
+  <div class="panel">
+    <h2>Receive Payment</h2>
+    <div class="form-grid">
+      <label>Date<input id="payDate" type="date"/></label>
+      <label>Customer<select id="payCustomer"></select></label>
+      <label>Receipt / Reference<input id="payRef" placeholder="Manual reference"/></label>
+      <label>Amount<input id="payAmount" type="number" step="0.01"/></label>
+      <label>Payment Method<select id="payMethod"><option>Cash</option><option>Bank</option><option>Cheque</option><option>Other</option></select></label>
+      <label>Note<input id="payNote"/></label>
+    </div>
+    <div id="paymentOutstandingHint" class="hint"></div>
+    <button id="savePayment" class="btn gold">Save Payment</button>
+  </div>
+  <div class="panel"><h2>Recent Payments</h2><div id="paymentList"></div></div>
+</section>
+
+<section id="returns" class="tab">
+  <div class="panel">
+    <h2>Sales Return</h2>
+    <div class="form-grid">
+      <label>Return Date<input id="retDate" type="date"/></label>
+      <label>Original Invoice<select id="retInvoice"></select></label>
+      <label>SKU Line<select id="retLine"></select></label>
+      <label>Returned Cartons<input id="retCartons" type="number" min="1" step="1"/></label>
+      <label>Return Reference<input id="retRef" placeholder="Manual reference"/></label>
+      <label>Reason<input id="retReason" placeholder="Optional"/></label>
+    </div>
+    <div id="returnPreview" class="hint"></div>
+    <button id="saveReturn" class="btn gold">Save Return</button>
+  </div>
+  <div class="panel"><h2>Return History</h2><div id="returnList"></div></div>
+</section>
+
+<section id="targets" class="tab">
+  <div class="panel">
+    <h2>Monthly Targets</h2>
+    <div class="form-grid">
+      <label>Month<input id="targetMonth" type="month"/></label>
+      <label>Target Level<select id="targetType"><option value="company">Overall Company</option><option value="customer">Customer</option><option value="salesman">Salesman</option></select></label>
+      <label id="targetEntityWrap">Entity<select id="targetEntity"></select></label>
+      <label>Tonnage Target<input id="targetTon" type="number" step="0.001"/></label>
+      <label>Amount Target<input id="targetAmount" type="number" step="0.01"/></label>
+    </div>
+    <button id="saveTarget" class="btn gold">Save / Update Target</button>
+  </div>
+  <div class="panel"><h2>Target Performance</h2><div id="targetList"></div></div>
+</section>
+
+<section id="reports" class="tab">
+  <div class="panel">
+    <h2>Reports & Ledger</h2>
+    <div class="form-grid">
+      <label>From<input id="rFrom" type="date"/></label>
+      <label>To<input id="rTo" type="date"/></label>
+      <label>Customer<select id="rCustomer"></select></label>
+      <label>Product<select id="rProduct"></select></label>
+      <label>Salesman<select id="rSalesman"></select></label>
+      <label>Status<select id="rStatus"><option value="">All Statuses</option><option>Pending</option><option>Dispatched</option><option>Delivered</option><option>Cancelled</option></select></label>
+    </div>
+    <div class="actions">
+      <button id="runReport" class="btn gold">Run Sales Report</button>
+      <button id="runOutstanding" class="btn outline">Outstanding Report</button>
+      <button id="exportCsv" class="btn outline">Export Sales CSV</button>
+      <button id="backupData" class="btn outline">Backup Data</button>
+      <label class="upload compact">Restore Backup<input id="restoreData" type="file" accept=".json"/></label>
+    </div>
+    <div id="reportOutput"></div>
+  </div>
+</section>
+</main>
+
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
