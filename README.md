@@ -1,33 +1,32 @@
 # Sales Ledger Android
 
-A modern offline Android app for customer-wise and SKU-wise sales, tonnage, payments and outstanding balances.
+Modern offline Android app for customer-wise and SKU-wise sales, tonnage, payments and outstanding balances.
 
-## Included
+## GitHub se APK banana
+1. Is ZIP ko extract karein.
+2. Extracted folder ke andar ki **tamam files aur folders** GitHub repository ke root mein upload karein.
+3. Repository mein `.github`, `app`, `build.gradle.kts`, `settings.gradle.kts` nazar aane chahiye.
+4. GitHub ke **Actions** tab mein `Build Android APK` open karein.
+5. `Run workflow` dabayen.
+6. Green tick ke baad run open karke `SalesLedger-APK` artifact download karein.
+7. Download ZIP extract karein; us ke andar `app-debug.apk` install karein.
+
+## Features
 - Manual customer entry
-- User-defined SKU code (no automatic serial number)
-- SKU name and code shown together
-- Manual date-wise sales entry
-- Automatic amount = tonnage × price
-- Opening outstanding import
+- Manual custom SKU code; auto serial numbering nahi
+- SKU code aur SKU name dono show hote hain
+- Date-wise sale entry
+- Amount = tonnage × price
 - Customer payments
-- Automatic current outstanding
-- Offline storage on the phone
-- Modern Jetpack Compose UI
+- Opening outstanding CSV import
+- Automatic outstanding calculation
+- Offline phone storage
 
-## Excel import format
-Save your Excel sheet as **CSV UTF-8** with these columns:
+## Outstanding import
+Excel file ko CSV UTF-8 mein save karein:
 
 Customer Code,Customer Name,Outstanding Amount
 C001,Ahmed Traders,250000
 C002,Ali Enterprises,175500
 
-Open Android Studio, select this folder, allow Gradle sync, then Build > Build APK(s).
-
-Minimum Android version: Android 8.0 (API 26).
-
-## Build APK using GitHub Actions
-1. Upload all project files, including the `.github` folder, to a GitHub repository.
-2. Open the repository's **Actions** tab.
-3. Open **Build Android APK** and choose **Run workflow**.
-4. After the run succeeds, open it and download the **SalesLedger-APK** artifact.
-5. Extract the downloaded artifact ZIP to get `app-debug.apk`.
+Minimum Android version: Android 8.0.
