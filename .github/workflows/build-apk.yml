@@ -1,92 +1,40 @@
-name: CI
+name: Build SUH Android APK
+
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-    tags:
-      - v*
-  pull_request:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    paths:
+      - "android-app/**"
+      - ".github/workflows/build-apk.yml"
 
 jobs:
   build:
-    name: Build app
     runs-on: ubuntu-latest
 
     steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
-        with:
-          egress-policy: block
-          allowed-endpoints: >
-            api.adoptopenjdk.net:443
-            api.github.com:443
-            dl.google.com:443
-            github.com:443
-            maven.google.com:443
-            plugins-artifacts.gradle.org:443
-            plugins.gradle.org:443
-            release-assets.githubusercontent.com:443
-            repo.maven.apache.org:443
-            services.gradle.org:443
-            spdx.org:443
-            uploads.github.com:443
-            www.jitpack.io:443
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Clone repo
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up JDK
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
-          java-version: 21
           distribution: temurin
+          java-version: "17"
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
-
-      - name: Build app
-        run: ./gradlew :app:testFullDebugUnitTest :app:assembleFullRelease
-
-      # Sign APK and create release for tags
-
-      - name: Prepare build metadata
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'LISTEN-moe/android-app'
-        run: |
-          set -x
-          VERSION_TAG="${GITHUB_REF/refs\/tags\//}"
-          echo "VERSION_TAG=${VERSION_TAG}" >> $GITHUB_ENV
-          if [[ "$VERSION_TAG" == *beta* ]] || [[ "$VERSION_TAG" == *alpha* ]]; then
-            echo "IS_PRERELEASE=true" >> $GITHUB_ENV
-          else
-            echo "IS_PRERELEASE=false" >> $GITHUB_ENV
-          fi
-
-      - name: Sign APK
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'LISTEN-moe/android-app'
-        uses: r0adkll/sign-android-release@349ebdef58775b1e0d8099458af0816dc79b6407 # v1
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          releaseDirectory: app/build/outputs/apk/full/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "35.0.0"
+          gradle-version: "8.10.2"
 
-      - name: Create release
-        if: startsWith(github.ref, 'refs/tags/') && github.repository == 'LISTEN-moe/android-app'
-        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+      - name: Build APK
+        working-directory: android-app
+        run: gradle assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ env.VERSION_TAG }}
-          name: ${{ env.VERSION_TAG }}
-          body_path: distribution/whatsnew/whatsnew-en-US
-          files: |
-            ${{ env.SIGNED_RELEASE_FILE }}
-          draft: true
-          prerelease: ${{ env.IS_PRERELEASE }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: SUH-Sales-Pro-APK
+          path: android-app/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
