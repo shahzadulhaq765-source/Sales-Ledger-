@@ -13,7 +13,7 @@
 <body>
 <header class="topbar">
   <div class="brand"><div class="logo">SUH</div><div><h1>SUH Sales Pro</h1><p>Distributor Sales Management</p></div></div>
-  <button id="installBtn" class="btn gold hidden">Install App</button>
+  <div class="header-actions"><button id="backBtn" class="btn outline back-btn" type="button" aria-label="Go back">← Back</button><button id="installBtn" class="btn gold hidden">Install App</button></div>
 </header>
 
 <nav class="tabs">
@@ -42,10 +42,17 @@
     <div class="card danger"><span>Total Outstanding</span><strong id="totalOutstanding">Rs 0</strong></div>
     <div class="card"><span>Month Collection</span><strong id="monthCollection">Rs 0</strong></div>
   </div>
-  <div class="grid two">
-    <div class="panel"><h3>Monthly Targets</h3><div id="dashTargets"></div></div>
-    <div class="panel"><h3>Delivery Status</h3><div id="deliverySummary"></div></div>
+  <div class="panel">
+    <div class="section-head"><div><h3>Monthly Target & Achievement</h3><div class="muted">Amount and tonnage are tracked separately.</div></div></div>
+    <div class="grid target-cards four">
+      <div class="card target-card"><span>Monthly Target — Amount</span><strong id="targetAmountDash">Rs 0</strong></div>
+      <div class="card target-card"><span>Achievement — Amount</span><strong id="achievementAmountDash">Rs 0</strong><em id="achievementAmountPct">0.0%</em></div>
+      <div class="card target-card"><span>Monthly Target — Tonnage</span><strong id="targetTonDash">0.000 tons</strong></div>
+      <div class="card target-card"><span>Achievement — Tonnage</span><strong id="achievementTonDash">0.000 tons</strong><em id="achievementTonPct">0.0%</em></div>
+    </div>
+    <div id="dashTargets"></div>
   </div>
+  <div class="panel"><h3>Delivery Status</h3><div id="deliverySummary"></div></div>
   <div class="grid two">
     <div class="panel"><h3>Top Customers</h3><div id="topCustomers"></div></div>
     <div class="panel"><h3>Top Products</h3><div id="topProducts"></div></div>
@@ -58,13 +65,17 @@
     <h2>Customer Master</h2>
     <input type="hidden" id="custEdit"/>
     <div class="form-grid">
-      <label>Customer Code<input id="custCode" inputmode="numeric" placeholder="9900001"/></label>
+      <label>SSS Code (Manual)<input id="custCode" inputmode="numeric" placeholder="990007"/></label>
       <label>Customer Name<input id="custName" placeholder="Ahmed Traders"/></label>
-      <label>Salesman<select id="custSalesman"></select></label>
-      <label>Phone<input id="custPhone" placeholder="Optional"/></label>
-      <label>Address<input id="custAddress" placeholder="Optional"/></label>
-      <label>Opening Outstanding<input id="custOpening" type="number" step="0.01" placeholder="0"/></label>
+      <label>Address<input id="custAddress" placeholder="Customer address"/></label>
+      <label>SSS Rate per Pc (Optional)<input id="custSssRate" type="number" step="0.01" placeholder="0"/></label>
+      <label>Atlas Rate per Pc (Optional)<input id="custAtlasRate" type="number" step="0.01" placeholder="0"/></label>
+      <label>Profit / Loss (Optional)<select id="custProfitLoss"><option value="">Auto from rates</option><option value="profit">↑ Profit</option><option value="loss">↓ Loss</option></select></label>
+      <label>Profit / Loss Amount<input id="custProfitLossAmount" type="number" step="0.01" readonly placeholder="Auto calculated"/></label>
+      <label>Approval Expire Date (Optional)<input id="custApprovalExpiry" type="date"/></label>
+      <label>Opening Outstanding (Optional)<input id="custOpening" type="number" step="0.01" placeholder="0"/></label>
     </div>
+    <div id="customerRatePreview" class="hint"></div>
     <div class="actions"><button id="saveCustomer" class="btn gold">Save Customer</button><button id="cancelCustomerEdit" class="btn ghost hidden">Cancel Edit</button></div>
     <label class="upload">Import Customers / Opening Outstanding CSV<input id="importCustomers" type="file" accept=".csv"/></label>
   </div>
@@ -76,19 +87,15 @@
     <h2>Product / SKU Master</h2>
     <input type="hidden" id="prodEdit"/>
     <div class="form-grid">
-      <label>Product Code<input id="prodCode" inputmode="numeric" placeholder="5124"/></label>
-      <label>Product Name<input id="prodName" placeholder="Mayonnaise"/></label>
-      <label>Brand / Company<input id="prodBrand" placeholder="Optional"/></label>
-      <label>Packing<input id="prodPacking" placeholder="12 × 1kg"/></label>
-      <label>Carton Weight (KG)<input id="prodWeight" type="number" step="0.001" placeholder="12"/></label>
-      <label>Pieces per Carton<input id="prodPieces" type="number" step="1" placeholder="12"/></label>
-      <label>Price Basis<select id="prodPriceBasis"><option value="piece">Per Piece</option><option value="ton">Per Ton</option></select></label>
-      <label>Current Selling Rate<input id="prodRate" type="number" step="0.01" placeholder="250"/></label>
-      <label>TP Price per Pc<input id="prodTpPrice" type="number" step="0.01" placeholder="Optional for SSSAP"/></label>
-      <label>Atlas Price per Pc (Optional)<input id="prodAtlasPrice" type="number" step="0.01"/></label>
-      <label>SSS Price per Pc (Optional)<input id="prodSssPrice" type="number" step="0.01"/></label>
-      <label>Approval Expire Date (Optional)<input id="prodApprovalExpiry" type="date"/></label>
+      <label>Product Code (Manual)<input id="prodCode" inputmode="numeric" placeholder="5124"/></label>
+      <label>SKU Name<input id="prodName" placeholder="Mayonnaise"/></label>
+      <label>TP Price per Pc incl. GST (PKR)<input id="prodTpPrice" type="number" step="0.01" placeholder="250"/></label>
+      <label>TO Scheme (PKR)<input id="prodToScheme" type="number" step="0.01" placeholder="0"/></label>
+      <label>Carton Size (No. of PCs)<input id="prodPieces" type="number" min="1" step="1" placeholder="12"/></label>
+      <label>Carton Weight<input id="prodWeight" type="number" min="0" step="0.001" placeholder="12"/></label>
+      <label>Weight Unit<select id="prodWeightUnit"><option value="kg">KG</option><option value="litre">Litre</option></select></label>
     </div>
+    <div id="productPricePreview" class="hint"></div>
     <div class="actions"><button id="saveProduct" class="btn gold">Save Product</button><button id="cancelProductEdit" class="btn ghost hidden">Cancel Edit</button></div>
   </div>
   <div class="panel"><div class="section-head"><h2>Products</h2><input id="productSearch" placeholder="Search code or name"/></div><div id="productList"></div></div>
@@ -124,12 +131,12 @@
       <div class="form-grid">
         <label>Product<select id="lineProduct"></select></label>
         <label>Cartons<input id="lineCartons" type="number" min="1" step="1"/></label>
-        <label id="lineRateLabel">Rate per Piece<input id="lineRate" type="number" step="0.01"/></label>
+        <label id="lineRateLabel">Rate per Piece (PKR)<input id="lineRate" type="number" step="0.01"/></label>
       </div>
       <div id="linePreview" class="hint"></div>
       <button id="addLine" class="btn outline">Add SKU</button>
     </div>
-    <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Packing</th><th>Cartons</th><th>Pcs/Ctn</th><th>Total Pcs</th><th>KG/Ctn</th><th>Total KG</th><th>Tons</th><th>Rate Basis</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceLines"></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Unit</th><th>Cartons</th><th>Pcs/Ctn</th><th>Total Pcs</th><th>Wt/Ctn</th><th>Total Wt</th><th>Tons</th><th>Rate Basis</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceLines"></tbody></table></div>
     <div class="invoice-totals"><div>Total Cartons <b id="invCartons">0</b></div><div>Total Tonnage <b id="invTon">0.000</b></div><div>Grand Total <b id="invTotal">Rs 0</b></div></div>
     <button id="saveInvoice" class="btn gold wide">Save Invoice</button>
   </div>
