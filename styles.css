@@ -21,3 +21,5 @@ main{max-width:1250px;margin:auto;padding:18px}.tab{display:none}.tab.active{dis
 .header-actions{display:flex;gap:8px;align-items:center}.back-btn{min-width:82px}.target-cards.four{grid-template-columns:repeat(4,minmax(0,1fr));margin:14px 0}.target-card em{display:inline-block;margin-top:8px;color:var(--gold2);font-style:normal;font-weight:800}.target-card strong{display:block}.profit{color:var(--green)}.loss{color:var(--danger)}
 @media(max-width:900px){.target-cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.target-cards.four{grid-template-columns:1fr}.back-btn{min-width:auto;padding:9px 11px}.header-actions{gap:6px}}
+
+.logo{overflow:hidden;background:#050505}.logo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:12px}
