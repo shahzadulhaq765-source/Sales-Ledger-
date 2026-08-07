@@ -48,3 +48,12 @@ Data is stored in the browser on the current device. Use **Backup Data** regular
 - Optional SSS Price per Pc
 - Optional Approval Expire Date
 - Optional fields excluded from invoice and print/PDF, included in Excel exports
+
+## Version 5 additions
+- Product Excel/CSV import with safe Product Code + SKU Name matching.
+- TP price and TO Scheme effective-date history.
+- Petrol Expense page with date-wise monthly entries and monthly total.
+- Petrol report export to PDF and JPG.
+- Immediate local auto-save plus rolling 7-day auto-backup snapshots, manual backup and restore.
+- Android file picker/download bridge for imports and exported files.
+- Branding line: Made by Shahzad Ul Haq.

@@ -12,7 +12,7 @@
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><div class="logo"><img src="assets/suh-final-logo.png" alt="SUH logo"/></div><div><h1>SUH Sales Pro</h1><p>Distributor Sales Management</p></div></div>
+  <div class="brand"><div class="logo"><img src="assets/suh-final-logo.png" alt="SUH logo"/></div><div><h1>SUH Sales Pro</h1><p>Distributor Sales Management</p><p class="made-by">Made by Shahzad Ul Haq</p></div></div>
   <div class="header-actions"><button id="backBtn" class="btn outline back-btn" type="button" aria-label="Go back">← Back</button><button id="installBtn" class="btn gold hidden">Install App</button></div>
 </header>
 
@@ -25,6 +25,7 @@
   <button data-tab="payments">Payments</button>
   <button data-tab="returns">Returns</button>
   <button data-tab="targets">Targets</button>
+  <button data-tab="petrol">Petrol Expense</button>
   <button data-tab="reports">Reports</button>
 </nav>
 
@@ -94,11 +95,17 @@
       <label>Carton Size (No. of PCs)<input id="prodPieces" type="number" min="1" step="1" placeholder="12"/></label>
       <label>Carton Weight<input id="prodWeight" type="number" min="0" step="0.001" placeholder="12"/></label>
       <label>Weight Unit<select id="prodWeightUnit"><option value="kg">KG</option><option value="litre">Litre</option></select></label>
+      <label>Price / Scheme Effective From<input id="prodEffectiveFrom" type="date"/></label>
     </div>
     <div id="productPricePreview" class="hint"></div>
     <div class="actions"><button id="saveProduct" class="btn gold">Save Product</button><button id="cancelProductEdit" class="btn ghost hidden">Cancel Edit</button></div>
+    <div class="actions import-actions">
+      <label class="upload compact">Import Product Excel / CSV<input id="importProducts" type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/></label>
+      <a class="btn outline link-btn" href="product_import_template.xlsx" download>Download Product Excel Template</a>
+    </div>
+    <div class="hint">Existing SKU update rule: Product Code must match. If SKU Name is different, the row is skipped with a warning to prevent a wrong overwrite. New Product Codes are added automatically.</div>
   </div>
-  <div class="panel"><div class="section-head"><h2>Products</h2><input id="productSearch" placeholder="Search code or name"/></div><div id="productList"></div></div>
+  <div class="panel"><div class="section-head"><h2>Products</h2><input id="productSearch" placeholder="Search code or name"/></div><div id="productHistory"></div><div id="productList"></div></div>
 </section>
 
 <section id="salesmen" class="tab">
@@ -191,6 +198,19 @@
   <div class="panel"><h2>Target Performance</h2><div id="targetList"></div></div>
 </section>
 
+<section id="petrol" class="tab">
+  <div class="panel">
+    <div class="section-head"><div><h2>Petrol Expense</h2><div class="muted">Enter only the days when petrol was purchased. Blank days are treated as zero.</div></div><label class="month-picker">Month<input id="petrolMonth" type="month"/></label></div>
+    <div class="petrol-summary"><span>Monthly Petrol Expense</span><strong id="petrolTotal">Rs 0</strong></div>
+    <div class="table-wrap petrol-table"><table><thead><tr><th>Date</th><th>Day</th><th>Petrol Amount (PKR)</th></tr></thead><tbody id="petrolRows"></tbody></table></div>
+    <div class="actions petrol-actions">
+      <button id="petrolPdf" class="btn gold">Save Petrol PDF</button>
+      <button id="petrolJpg" class="btn outline">Save Petrol JPG</button>
+    </div>
+    <div id="petrolHistorySummary" class="hint"></div>
+  </div>
+</section>
+
 <section id="reports" class="tab">
   <div class="panel">
     <h2>Reports & Ledger</h2>
@@ -212,14 +232,17 @@
       <button id="printReport" class="btn outline">Print / Save PDF</button>
       <button id="shareWhatsapp" class="btn outline">Share on WhatsApp</button>
       <button id="backupData" class="btn outline">Backup Data</button>
+      <button id="restoreAutoBackup" class="btn outline">Restore Latest Auto Backup</button>
       <label class="upload compact">Restore Backup<input id="restoreData" type="file" accept=".json"/></label>
     </div>
+    <div id="backupStatus" class="hint"></div>
     <div id="reportOutput"></div>
   </div>
 </section>
 </main>
 
 <div id="toast"></div>
+<script src="assets/jszip.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

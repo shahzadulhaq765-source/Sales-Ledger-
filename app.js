@@ -4,12 +4,13 @@ const num=n=>new Intl.NumberFormat("en-PK",{maximumFractionDigits:3}).format(Num
 const today=()=>new Date().toISOString().slice(0,10);
 const monthNow=()=>today().slice(0,7);
 const id=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random();
-let db=JSON.parse(localStorage.getItem("suh-full-db")||'{"customers":[],"products":[],"salesmen":[],"invoices":[],"payments":[],"returns":[],"targets":[]}');
+let db=JSON.parse(localStorage.getItem("suh-full-db")||'{"customers":[],"products":[],"salesmen":[],"invoices":[],"payments":[],"returns":[],"targets":[],"petrolExpenses":[]}');
 let lines=[];
 
 // Keep old saved records compatible with the simplified final masters.
 db.customers=(db.customers||[]).map(c=>({...c,sssRate:Number(c.sssRate??c.sssPrice??0),atlasRate:Number(c.atlasRate??c.atlasPrice??0),profitLoss:c.profitLoss||"",approvalExpiry:c.approvalExpiry||""}));
-db.products=(db.products||[]).map(p=>({...p,tpPrice:Number(p.tpPrice??p.rate??0),toScheme:Number(p.toScheme||0),piecesPerCarton:Number(p.piecesPerCarton||0),cartonWeight:Number(p.cartonWeight||0),weightUnit:p.weightUnit||"kg",priceBasis:"piece",rate:Number(p.rate??p.tpPrice??0)}));
+db.products=(db.products||[]).map(p=>({...p,tpPrice:Number(p.tpPrice??p.rate??0),toScheme:Number(p.toScheme||0),piecesPerCarton:Number(p.piecesPerCarton||0),cartonWeight:Number(p.cartonWeight||0),weightUnit:p.weightUnit||"kg",priceBasis:"piece",rate:Number(p.rate??p.tpPrice??0),priceHistory:Array.isArray(p.priceHistory)?p.priceHistory:[],schemeHistory:Array.isArray(p.schemeHistory)?p.schemeHistory:[]}));
+db.petrolExpenses=Array.isArray(db.petrolExpenses)?db.petrolExpenses:[];
 
 function effectiveProductRate(p){return Math.max(0,Number(p?.tpPrice||0)-Number(p?.toScheme||0))}
 function customerProfitLoss(c){
@@ -22,7 +23,16 @@ function weightLabel(unit){return unit==="litre"?"L":"kg"}
 function toTonnage(cartons,p){return Number(cartons||0)*Number(p?.cartonWeight||0)/1000}
 
 function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500)}
-function persist(){localStorage.setItem("suh-full-db",JSON.stringify(db));renderAll()}
+function autoSnapshot(){
+ try{
+  const key="suh-auto-backups",stamp=today(),raw=JSON.stringify(db);
+  let arr=JSON.parse(localStorage.getItem(key)||"[]");
+  const item={date:stamp,savedAt:new Date().toISOString(),data:raw};
+  const i=arr.findIndex(x=>x.date===stamp); if(i>=0)arr[i]=item; else arr.push(item);
+  arr=arr.slice(-7); localStorage.setItem(key,JSON.stringify(arr));
+ }catch(e){}
+}
+function persist(){localStorage.setItem("suh-full-db",JSON.stringify(db));autoSnapshot();renderAll()}
 function cName(code){const c=db.customers.find(x=>x.code===code);return c?c.name:""}
 function pName(code){const p=db.products.find(x=>x.code===code);return p?p.name:""}
 function smName(code){const s=db.salesmen.find(x=>x.code===code);return s?s.name:"Unassigned"}
@@ -115,8 +125,13 @@ function renderCustomers(){
 }
 function renderProducts(){
  const q=$("#productSearch").value.toLowerCase();
- $("#productList").innerHTML=db.products.filter(p=>(p.code+" "+p.name).toLowerCase().includes(q)).map(p=>`<div class="list-row"><div><b>${esc(p.code)} — ${esc(p.name)}</b><div class="muted">${num(p.piecesPerCarton||0)} pcs/carton • ${num(p.cartonWeight)} ${weightLabel(p.weightUnit)}/carton</div></div><div class="right"><b>TP ${money(p.tpPrice||0)}/pc</b><div class="muted">TO Scheme: ${money(p.toScheme||0)} • Net rate: ${money(effectiveProductRate(p))}/pc</div><div class="mini-actions"><button onclick="editProduct('${esc(p.code)}')">Edit</button></div></div></div>`).join("")||'<p class="muted">No products.</p>';
+ $("#productList").innerHTML=db.products.filter(p=>(p.code+" "+p.name).toLowerCase().includes(q)).map(p=>`<div class="list-row"><div><b>${esc(p.code)} — ${esc(p.name)}</b><div class="muted">${num(p.piecesPerCarton||0)} pcs/carton • ${num(p.cartonWeight)} ${weightLabel(p.weightUnit)}/carton</div></div><div class="right"><b>TP ${money(p.tpPrice||0)}/pc</b><div class="muted">TO Scheme: ${money(p.toScheme||0)} • Net rate: ${money(effectiveProductRate(p))}/pc</div><div class="mini-actions"><button onclick="showProductHistory('${esc(p.code)}')">History</button><button onclick="editProduct('${esc(p.code)}')">Edit</button></div></div></div>`).join("")||'<p class="muted">No products.</p>';
 }
+window.showProductHistory=code=>{
+ const p=db.products.find(x=>x.code===code); if(!p)return;
+ const fmt=(arr,key)=>arr.length?arr.slice().reverse().map(h=>`<div class="history-row"><b>${money(h[key]||0)}</b><div class="muted">${h.from||"Earlier"} → ${h.to||"Current"}</div></div>`).join(""):'<div class="muted">No changes recorded yet.</div>';
+ $("#productHistory").innerHTML=`<div class="history-box"><div class="section-head"><h3>${esc(p.code)} — ${esc(p.name)} History</h3><button class="btn ghost" onclick="document.querySelector('#productHistory').innerHTML=''">Close</button></div><div class="history-grid"><div><h4>TP Price History</h4>${fmt(p.priceHistory||[],"tpPrice")}</div><div><h4>TO Scheme History</h4>${fmt(p.schemeHistory||[],"toScheme")}</div></div></div>`;
+};
 function renderSalesmen(){
  $("#salesmanList").innerHTML=db.salesmen.map(s=>{const customers=db.customers.filter(c=>c.salesman===s.code).length;const m=monthlyMetrics(monthNow(),{salesman:s.code});return `<div class="list-row"><div><b>${esc(s.code)} — ${esc(s.name)}</b><div class="muted">${esc(s.phone||"")} • ${customers} customers</div></div><div class="right">${money(m.amount)}<div class="muted">${num(m.tonnage)} tons this month</div></div></div>`}).join("")||'<p class="muted">No salesmen.</p>';
 }
@@ -136,7 +151,7 @@ function renderLines(){
 }
 window.removeLine=i=>{lines.splice(i,1);renderLines()};
 
-function renderAll(){selectOptions();renderDashboard();renderCustomers();renderProducts();renderSalesmen();renderPayments();renderReturns();renderTargets();renderLines();}
+function renderAll(){selectOptions();renderDashboard();renderCustomers();renderProducts();renderSalesmen();renderPayments();renderReturns();renderTargets();renderLines();renderPetrol();renderBackupStatus();}
 
 $("#customerSearch").oninput=renderCustomers;$("#productSearch").oninput=renderProducts;
 $("#saveSalesman").onclick=()=>{const code=$("#smCode").value.trim(),name=$("#smName").value.trim();if(!code||!name)return toast("Salesman code and name required");if(db.salesmen.some(s=>s.code===code))return toast("Salesman code already exists");db.salesmen.push({code,name,phone:$("#smPhone").value.trim()});$("#smCode").value=$("#smName").value=$("#smPhone").value="";persist();toast("Salesman saved")};
@@ -155,9 +170,21 @@ window.editCustomer=code=>{const c=db.customers.find(x=>x.code===code);if(!c)ret
 
 function updateProductPricePreview(){const tp=Number($("#prodTpPrice").value||0),scheme=Number($("#prodToScheme").value||0);$("#productPricePreview").textContent=tp?`TP incl. GST ${money(tp)}/pc − TO Scheme ${money(scheme)} = Net invoice rate ${money(Math.max(0,tp-scheme))}/pc`:""}
 ["#prodTpPrice","#prodToScheme"].forEach(s=>$(s).oninput=updateProductPricePreview);
-$("#saveProduct").onclick=()=>{const old=$("#prodEdit").value,code=$("#prodCode").value.trim(),name=$("#prodName").value.trim(),tpPrice=Number($("#prodTpPrice").value||0),toScheme=Number($("#prodToScheme").value||0);if(!code||!name)return toast("Product code and SKU name required");if(!old&&db.products.some(p=>p.code===code))return toast("Product code already exists");const rate=Math.max(0,tpPrice-toScheme),base={code,name,cartonWeight:Number($("#prodWeight").value||0),weightUnit:$("#prodWeightUnit").value,piecesPerCarton:Number($("#prodPieces").value||0),priceBasis:"piece",rate,tpPrice,toScheme};if(old){const i=db.products.findIndex(p=>p.code===old),prev=db.products[i];const hist=[...(prev.priceHistory||[])];if(Number(prev.tpPrice||0)!==tpPrice||Number(prev.toScheme||0)!==toScheme)hist.push({date:today(),oldRate:effectiveProductRate(prev),newRate:rate});db.products[i]={...prev,...base,priceHistory:hist}}else db.products.push({...base,priceHistory:[]});clearProductForm();persist();toast("Product saved")};
-function clearProductForm(){["#prodEdit","#prodCode","#prodName","#prodWeight","#prodPieces","#prodTpPrice","#prodToScheme"].forEach(s=>$(s).value="");$("#prodWeightUnit").value="kg";$("#productPricePreview").textContent="";$("#cancelProductEdit").classList.add("hidden")}
-window.editProduct=code=>{const p=db.products.find(x=>x.code===code);if(!p)return;$("#prodEdit").value=p.code;$("#prodCode").value=p.code;$("#prodName").value=p.name;$("#prodWeight").value=p.cartonWeight;$("#prodWeightUnit").value=p.weightUnit||"kg";$("#prodPieces").value=p.piecesPerCarton||0;$("#prodTpPrice").value=p.tpPrice||"";$("#prodToScheme").value=p.toScheme||"";updateProductPricePreview();$("#cancelProductEdit").classList.remove("hidden");switchTab("products")};$("#cancelProductEdit").onclick=clearProductForm;
+function dayBefore(date){const d=new Date(date+"T12:00:00");d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)}
+function updateValueHistory(arr,key,oldValue,newValue,effective){
+ arr=Array.isArray(arr)?arr.slice():[]; oldValue=Number(oldValue||0); newValue=Number(newValue||0);
+ if(oldValue===newValue)return arr;
+ const last=arr[arr.length-1];
+ if(last&&!last.to)last.to=dayBefore(effective); else arr.push({from:"",to:dayBefore(effective),[key]:oldValue});
+ arr.push({from:effective,to:"",[key]:newValue}); return arr;
+}
+function saveProductObject(prev,base,effective){
+ if(!prev)return {...base,createdAt:effective,priceHistory:[{from:effective,to:"",tpPrice:Number(base.tpPrice||0)}],schemeHistory:[{from:effective,to:"",toScheme:Number(base.toScheme||0)}]};
+ return {...prev,...base,priceHistory:updateValueHistory(prev.priceHistory,"tpPrice",prev.tpPrice,base.tpPrice,effective),schemeHistory:updateValueHistory(prev.schemeHistory,"toScheme",prev.toScheme,base.toScheme,effective)};
+}
+$("#saveProduct").onclick=()=>{const old=$("#prodEdit").value,code=$("#prodCode").value.trim(),name=$("#prodName").value.trim(),tpPrice=Number($("#prodTpPrice").value||0),toScheme=Number($("#prodToScheme").value||0),effective=$("#prodEffectiveFrom").value||today();if(!code||!name)return toast("Product code and SKU name required");if(!old&&db.products.some(p=>p.code===code))return toast("Product code already exists");const base={code,name,cartonWeight:Number($("#prodWeight").value||0),weightUnit:$("#prodWeightUnit").value,piecesPerCarton:Number($("#prodPieces").value||0),priceBasis:"piece",rate:Math.max(0,tpPrice-toScheme),tpPrice,toScheme};if(old){const i=db.products.findIndex(p=>p.code===old),prev=db.products[i];db.products[i]=saveProductObject(prev,base,effective)}else db.products.push(saveProductObject(null,base,effective));clearProductForm();persist();toast("Product saved")};
+function clearProductForm(){["#prodEdit","#prodCode","#prodName","#prodWeight","#prodPieces","#prodTpPrice","#prodToScheme"].forEach(s=>$(s).value="");$("#prodWeightUnit").value="kg";$("#prodEffectiveFrom").value=today();$("#productPricePreview").textContent="";$("#cancelProductEdit").classList.add("hidden")}
+window.editProduct=code=>{const p=db.products.find(x=>x.code===code);if(!p)return;$("#prodEdit").value=p.code;$("#prodCode").value=p.code;$("#prodName").value=p.name;$("#prodWeight").value=p.cartonWeight;$("#prodWeightUnit").value=p.weightUnit||"kg";$("#prodPieces").value=p.piecesPerCarton||0;$("#prodTpPrice").value=p.tpPrice||"";$("#prodToScheme").value=p.toScheme||"";$("#prodEffectiveFrom").value=today();updateProductPricePreview();$("#cancelProductEdit").classList.remove("hidden");switchTab("products")};$("#cancelProductEdit").onclick=clearProductForm;
 
 $("#lineProduct").onchange=()=>{const p=db.products.find(x=>x.code===$("#lineProduct").value);$("#lineRate").value=p?effectiveProductRate(p):"";previewLine()};
 $("#lineCartons").oninput=previewLine;$("#lineRate").oninput=previewLine;
@@ -238,13 +265,68 @@ function buildShareText(){
  return text;
 }
 
+function utf8Base64(text){const bytes=new TextEncoder().encode(text);let bin="";for(let i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(bin)}
+function downloadBase64(name,b64,type){
+ if(window.SUHAndroid&&typeof window.SUHAndroid.saveBase64==="function"){window.SUHAndroid.saveBase64(name,type,b64);toast(name+" saved to Downloads");return}
+ const a=document.createElement("a");a.href=`data:${type};base64,${b64}`;a.download=name;a.click();
+}
+function download(name,data,type){downloadBase64(name,utf8Base64(data),type)}
 $("#backupData").onclick=()=>download("SUH-backup-"+today()+".json",JSON.stringify(db,null,2),"application/json");
-$("#restoreData").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);persist();toast("Backup restored")}catch{toast("Invalid backup file")}};r.readAsText(f)};
-function download(name,data,type){const a=document.createElement("a"),u=URL.createObjectURL(new Blob([data],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),500)}
+$("#restoreData").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);db.petrolExpenses=Array.isArray(db.petrolExpenses)?db.petrolExpenses:[];persist();toast("Backup restored")}catch{toast("Invalid backup file")}};r.readAsText(f)};
+$("#restoreAutoBackup").onclick=()=>{try{const arr=JSON.parse(localStorage.getItem("suh-auto-backups")||"[]");if(!arr.length)return toast("No auto backup available");db=JSON.parse(arr[arr.length-1].data);db.petrolExpenses=Array.isArray(db.petrolExpenses)?db.petrolExpenses:[];localStorage.setItem("suh-full-db",JSON.stringify(db));renderAll();toast("Latest auto backup restored")}catch(e){toast("Auto backup could not be restored")}};
+function renderBackupStatus(){const el=$("#backupStatus");if(!el)return;let arr=[];try{arr=JSON.parse(localStorage.getItem("suh-auto-backups")||"[]")}catch(e){}const last=arr[arr.length-1];el.textContent=`Auto Save: ON • Every saved change stays on this device${last?` • Latest auto backup: ${new Date(last.savedAt).toLocaleString()}`:""} • 7 daily snapshots retained.`}
+
+
+function normText(v){return String(v??"").trim().toLowerCase().replace(/\s+/g," ")}
+function parseCsv(text){
+ const rows=[];let row=[],cell="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(ch==='"'){if(q&&next==='"'){cell+='"';i++}else q=!q}else if(ch===','&&!q){row.push(cell);cell=""}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&next==='\n')i++;row.push(cell);if(row.some(x=>String(x).trim()!==""))rows.push(row);row=[];cell=""}else cell+=ch}
+ row.push(cell);if(row.some(x=>String(x).trim()!==""))rows.push(row);return rows;
+}
+function colIndex(ref){let n=0;for(const ch of (ref.match(/[A-Z]+/i)||[""])[0].toUpperCase())n=n*26+ch.charCodeAt(0)-64;return n-1}
+async function parseXlsx(file){
+ const zip=await JSZip.loadAsync(await file.arrayBuffer()), shared=[];
+ if(zip.file("xl/sharedStrings.xml")){const doc=new DOMParser().parseFromString(await zip.file("xl/sharedStrings.xml").async("string"),"application/xml");doc.querySelectorAll("si").forEach(si=>shared.push([...si.querySelectorAll("t")].map(t=>t.textContent).join("")))}
+ let sheetPath="xl/worksheets/sheet1.xml";
+ if(zip.file("xl/workbook.xml")&&zip.file("xl/_rels/workbook.xml.rels")){
+  const wb=new DOMParser().parseFromString(await zip.file("xl/workbook.xml").async("string"),"application/xml"), first=wb.querySelector("sheet"),rid=first?.getAttribute("r:id")||first?.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","id");
+  const rel=new DOMParser().parseFromString(await zip.file("xl/_rels/workbook.xml.rels").async("string"),"application/xml");const r=[...rel.querySelectorAll("Relationship")].find(x=>x.getAttribute("Id")===rid);if(r){let target=r.getAttribute("Target")||"worksheets/sheet1.xml";sheetPath="xl/"+target.replace(/^\//,"").replace(/^xl\//,"")}
+ }
+ const xml=await zip.file(sheetPath).async("string"),doc=new DOMParser().parseFromString(xml,"application/xml"),rows=[];
+ doc.querySelectorAll("sheetData row").forEach(r=>{const out=[];r.querySelectorAll("c").forEach(c=>{const idx=colIndex(c.getAttribute("r")||"A1"),type=c.getAttribute("t"),v=c.querySelector("v")?.textContent??"",inline=[...c.querySelectorAll("is t")].map(t=>t.textContent).join("");out[idx]=type==="s"?(shared[Number(v)]??""):type==="inlineStr"?inline:v});rows.push(out)});return rows;
+}
+function headerMap(headers){const map={};headers.forEach((h,i)=>map[normText(h).replace(/[^a-z0-9]+/g," ").trim()]=i);return map}
+function pick(row,map,names){for(const n of names){const k=normText(n).replace(/[^a-z0-9]+/g," ").trim();if(map[k]!==undefined)return row[map[k]]??""}return ""}
+function excelDate(v){if(!v)return today();if(/^\d{4}-\d{2}-\d{2}$/.test(String(v).trim()))return String(v).trim();const n=Number(v);if(Number.isFinite(n)&&n>20000){const d=new Date(Date.UTC(1899,11,30)+n*86400000);return d.toISOString().slice(0,10)}return today()}
+$("#importProducts").onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;try{
+  const rows=f.name.toLowerCase().endsWith(".xlsx")?await parseXlsx(f):parseCsv(await f.text());if(rows.length<2)return toast("Product file has no data rows");
+  const map=headerMap(rows[0]),stats={added:0,updated:0,skipped:0},warnings=[];
+  for(const row of rows.slice(1)){
+   const code=String(pick(row,map,["Product Code","SKU Code","Code"])).trim(),name=String(pick(row,map,["SKU Name","Product Name","Name"])).trim();if(!code||!name){stats.skipped++;continue}
+   const tpPrice=Number(String(pick(row,map,["TP Price per Pc including GST in PKR","TP Price per Pcs including Gst in PKR","TP Price per Pc incl GST","TP Price","TP"])).replace(/,/g,"")||0),toScheme=Number(String(pick(row,map,["TO Scheme in PKR","TO Scheme","Scheme"])).replace(/,/g,"")||0),piecesPerCarton=Number(String(pick(row,map,["Carton Size (No of PCs)","Carton Size","Pieces per Carton","Pcs Carton"])).replace(/,/g,"")||0),cartonWeight=Number(String(pick(row,map,["Carton Weight","Weight"])).replace(/,/g,"")||0),weightUnit=normText(pick(row,map,["Weight Unit","Unit"]))==="litre"?"litre":"kg",effective=excelDate(pick(row,map,["Effective From","Effective Date","Date"]));
+   const base={code,name,tpPrice,toScheme,piecesPerCarton,cartonWeight,weightUnit,priceBasis:"piece",rate:Math.max(0,tpPrice-toScheme)},i=db.products.findIndex(p=>p.code===code);
+   if(i>=0){if(normText(db.products[i].name)!==normText(name)){stats.skipped++;warnings.push(`${code}: name mismatch (${db.products[i].name} / ${name})`);continue}db.products[i]=saveProductObject(db.products[i],base,effective);stats.updated++}else{db.products.push(saveProductObject(null,base,effective));stats.added++}
+  }
+  persist();const msg=`Product import complete: ${stats.added} new, ${stats.updated} updated, ${stats.skipped} skipped.`;$("#productHistory").innerHTML=`<div class="history-box"><h3>Import Result</h3><div class="success-text">${esc(msg)}</div>${warnings.length?`<div class="warning-text" style="margin-top:8px">${warnings.slice(0,10).map(esc).join("<br>")}${warnings.length>10?`<br>+${warnings.length-10} more`:""}</div>`:""}</div>`;toast(msg)
+ }catch(err){console.error(err);toast("Could not read product Excel/CSV file")}finally{e.target.value=""}
+};
+
+function daysInMonth(month){const [y,m]=month.split("-").map(Number);return new Date(y,m,0).getDate()}
+function petrolForMonth(month){return db.petrolExpenses.filter(x=>x.date.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date))}
+function renderPetrol(){const month=$("#petrolMonth")?.value||monthNow();if(!$("#petrolRows"))return;const count=daysInMonth(month),map=new Map(petrolForMonth(month).map(x=>[x.date,x]));let html="",total=0;for(let d=1;d<=count;d++){const date=`${month}-${String(d).padStart(2,"0")}`,item=map.get(date),amt=Number(item?.amount||0);total+=amt;const day=new Date(date+"T12:00:00").toLocaleDateString("en-PK",{weekday:"short"});html+=`<tr><td>${date}</td><td>${day}</td><td><input class="petrol-amount" data-date="${date}" type="number" min="0" step="0.01" placeholder="0" value="${amt||""}"></td></tr>`}$("#petrolRows").innerHTML=html;$("#petrolTotal").textContent=money(total);$("#petrolHistorySummary").textContent=`${month}: ${petrolForMonth(month).filter(x=>Number(x.amount)>0).length} petrol entries saved • Total ${money(total)}`;$$('.petrol-amount').forEach(inp=>inp.onchange=()=>savePetrolDay(inp.dataset.date,inp.value))}
+function savePetrolDay(date,value){const amount=Number(value||0),i=db.petrolExpenses.findIndex(x=>x.date===date);if(amount>0){if(i>=0)db.petrolExpenses[i].amount=amount;else db.petrolExpenses.push({id:id(),date,amount})}else if(i>=0)db.petrolExpenses.splice(i,1);persist();toast(amount>0?"Petrol expense saved":"Petrol entry cleared")}
+$("#petrolMonth").onchange=renderPetrol;
+function petrolReportRows(){const month=$("#petrolMonth").value,items=petrolForMonth(month),map=new Map(items.map(x=>[x.date,x]));return {month,rows:Array.from({length:daysInMonth(month)},(_,i)=>{const date=`${month}-${String(i+1).padStart(2,"0")}`;return {date,day:new Date(date+"T12:00:00").toLocaleDateString("en-PK",{weekday:"short"}),amount:Number(map.get(date)?.amount||0)}}),total:items.reduce((a,x)=>a+Number(x.amount||0),0)}}
+function pdfEscape(s){return String(s).replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)")}
+function makeSimplePdf(lines){const content=["BT","/F1 10 Tf","50 800 Td","14 TL",...lines.flatMap((line,i)=>i?[`0 -14 Td`,`(${pdfEscape(line)}) Tj`]:[`(${pdfEscape(line)}) Tj`]),"ET"].join("\n"),objs=[null,"<< /Type /Catalog /Pages 2 0 R >>","<< /Type /Pages /Kids [3 0 R] /Count 1 >>","<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>",`<< /Length ${content.length} >>\nstream\n${content}\nendstream`,`<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>`];let out="%PDF-1.4\n",offs=[0];for(let i=1;i<objs.length;i++){offs[i]=new TextEncoder().encode(out).length;out+=`${i} 0 obj\n${objs[i]}\nendobj\n`}const xref=new TextEncoder().encode(out).length;out+=`xref\n0 ${objs.length}\n0000000000 65535 f \n`;for(let i=1;i<objs.length;i++)out+=String(offs[i]).padStart(10,"0")+" 00000 n \n";out+=`trailer\n<< /Size ${objs.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;return out}
+$("#petrolPdf").onclick=()=>{const r=petrolReportRows(),lines=["SUH Sales Pro - Petrol Expense Report","Made by Shahzad Ul Haq",`Month: ${r.month}`,"-----------------------------------------------","Date         Day        Amount (PKR)","-----------------------------------------------",...r.rows.map(x=>`${x.date}   ${x.day.padEnd(9," ")} ${x.amount?x.amount.toFixed(2):"-"}`),"-----------------------------------------------",`TOTAL PETROL EXPENSE: PKR ${r.total.toFixed(2)}`];download("SUH-Petrol-"+r.month+".pdf",makeSimplePdf(lines),"application/pdf")};
+$("#petrolJpg").onclick=()=>{const r=petrolReportRows(),canvas=document.createElement("canvas"),w=1200,lineH=38,h=230+r.rows.length*lineH+100;canvas.width=w;canvas.height=h;const c=canvas.getContext("2d");c.fillStyle="#ffffff";c.fillRect(0,0,w,h);c.fillStyle="#111111";c.font="bold 34px Arial";c.fillText("SUH Sales Pro - Petrol Expense",50,55);c.font="20px Arial";c.fillText("Made by Shahzad Ul Haq",50,90);c.fillText("Month: "+r.month,50,125);c.font="bold 20px Arial";c.fillText("Date",50,180);c.fillText("Day",330,180);c.fillText("Amount (PKR)",560,180);c.font="19px Arial";let y=220;r.rows.forEach(x=>{c.fillText(x.date,50,y);c.fillText(x.day,330,y);c.fillText(x.amount?x.amount.toFixed(2):"-",560,y);y+=lineH});c.font="bold 24px Arial";c.fillText("Total Petrol Expense: PKR "+r.total.toFixed(2),50,y+30);const data=canvas.toDataURL("image/jpeg",0.92).split(",")[1];downloadBase64("SUH-Petrol-"+r.month+".jpg",data,"image/jpeg")};
+window.addEventListener("beforeunload",()=>{try{localStorage.setItem("suh-full-db",JSON.stringify(db));autoSnapshot()}catch(e){}});
 
 $("#importCustomers").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let n=0;r.result.split(/\r?\n/).slice(1).forEach(line=>{if(!line.trim())return;const parts=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)||[];const [code,name,address,sssRate,atlasRate,profitLoss,approvalExpiry,opening]=parts.map(x=>x.trim().replace(/^"|"$/g,""));if(!code||!name)return;const sss=Number((sssRate||"0").replace(/,/g,"")),atlas=Number((atlasRate||"0").replace(/,/g,"")),signed=sss-atlas;const obj={code,name,address:address||"",sssRate:sss,atlasRate:atlas,profitLoss:signed>0?"profit":signed<0?"loss":(profitLoss||""),profitLossAmount:Math.abs(signed),approvalExpiry:approvalExpiry||"",opening:Number((opening||"0").replace(/,/g,""))},i=db.customers.findIndex(c=>c.code===code);if(i>=0)db.customers[i]={...db.customers[i],...obj};else db.customers.push(obj);n++});persist();toast(n+" customers imported")};r.readAsText(f)};
 
-["#invDate","#payDate","#retDate"].forEach(s=>$(s).value=today());$("#targetMonth").value=monthNow();$("#rFrom").value=monthNow()+"-01";$("#rTo").value=today();
+["#invDate","#payDate","#retDate"].forEach(s=>$(s).value=today());$("#targetMonth").value=monthNow();$("#prodEffectiveFrom").value=today();$("#petrolMonth").value=monthNow();$("#rFrom").value=monthNow()+"-01";$("#rTo").value=today();
 
 let deferredPrompt;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("#installBtn").classList.remove("hidden")});$("#installBtn").onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("#installBtn").classList.add("hidden")};
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
