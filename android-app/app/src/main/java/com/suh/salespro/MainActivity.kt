@@ -21,6 +21,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 
@@ -124,6 +125,26 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread { Toast.makeText(this@MainActivity, "$fileName saved", Toast.LENGTH_SHORT).show() }
             } catch (e: Exception) {
                 runOnUiThread { Toast.makeText(this@MainActivity, "Could not save $fileName", Toast.LENGTH_SHORT).show() }
+            }
+        }
+
+        @JavascriptInterface
+        fun shareBase64(fileName: String, mimeType: String, base64Data: String) {
+            try {
+                val bytes = Base64.decode(base64Data, Base64.DEFAULT)
+                val folder = File(cacheDir, "shared")
+                if (!folder.exists()) folder.mkdirs()
+                val file = File(folder, fileName)
+                FileOutputStream(file).use { it.write(bytes) }
+                val uri = FileProvider.getUriForFile(this@MainActivity, packageName + ".fileprovider", file)
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = mimeType
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                runOnUiThread { startActivity(Intent.createChooser(intent, "Share invoice on WhatsApp")) }
+            } catch (e: Exception) {
+                runOnUiThread { Toast.makeText(this@MainActivity, "Could not share invoice", Toast.LENGTH_SHORT).show() }
             }
         }
     }

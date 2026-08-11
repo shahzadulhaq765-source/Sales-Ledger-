@@ -146,6 +146,16 @@
     <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Unit</th><th>Cartons</th><th>Pcs/Ctn</th><th>Total Pcs</th><th>Wt/Ctn</th><th>Total Wt</th><th>Tons</th><th>Rate Basis</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceLines"></tbody></table></div>
     <div class="invoice-totals"><div>Total Cartons <b id="invCartons">0</b></div><div>Total Tonnage <b id="invTon">0.000</b></div><div>Grand Total <b id="invTotal">Rs 0</b></div></div>
     <button id="saveInvoice" class="btn gold wide">Save Invoice</button>
+    <div class="invoice-export-box">
+      <h3>Saved Invoice Copy</h3>
+      <label>Select Invoice<select id="exportInvoice"></select></label>
+      <div class="invoice-export-actions">
+        <button id="invoicePdf" class="btn gold">Save PDF</button>
+        <button id="invoiceJpg" class="btn outline">Save JPG</button>
+        <button id="invoiceWhatsapp" class="btn outline">Share on WhatsApp</button>
+      </div>
+      <div class="hint">Yellow/black professional invoice with SUH logo and watermark.</div>
+    </div>
   </div>
 </section>
 
