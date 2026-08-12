@@ -29,3 +29,5 @@ main{max-width:1250px;margin:auto;padding:18px}.tab{display:none}.tab.active{dis
 .invoice-export-box{margin-top:18px;padding:16px;border:1px solid #e5c400;border-radius:14px;background:linear-gradient(180deg,#fffdf2,#fff)}
 .invoice-export-box h3{margin:0 0 12px;color:#111}.invoice-export-box label{display:block;max-width:520px}.invoice-export-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 @media(max-width:640px){.invoice-export-actions .btn{flex:1 1 100%}}
+
+.invoice-search-results{max-height:280px;overflow:auto;margin:10px 0 14px;border:1px solid #ddd;border-radius:10px;padding:0 10px;background:#fff;color:#111}.invoice-search-results .muted{color:#666}.invoice-search-results .list-row{border-color:#e8e8e8}.invoice-export-box input,.invoice-export-box select{background:#fff;color:#111;border-color:#bbb}

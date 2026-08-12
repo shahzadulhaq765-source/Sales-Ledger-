@@ -22,6 +22,7 @@
   <button data-tab="products">Products</button>
   <button data-tab="salesmen">Salesmen</button>
   <button data-tab="invoice">Invoice</button>
+  <button data-tab="scheme">Scheme</button>
   <button data-tab="payments">Payments</button>
   <button data-tab="returns">Returns</button>
   <button data-tab="targets">Targets</button>
@@ -81,6 +82,7 @@
     <label class="upload">Import Customers / Opening Outstanding CSV<input id="importCustomers" type="file" accept=".csv"/></label>
   </div>
   <div class="panel"><div class="section-head"><h2>Customers</h2><input id="customerSearch" placeholder="Search code or name"/></div><div id="customerList"></div></div>
+  <div class="panel"><h2>Customer Data Export</h2><div class="form-grid"><label>Customer<select id="customerExportSelect"></select></label></div><div class="actions"><button id="customerExportExcel" class="btn gold">Export Excel/CSV</button><button id="customerExportPdf" class="btn outline">Export PDF</button></div><div class="hint">Exports saved customer rates plus invoice product SKU, selling price, SSS rate, Atlas rate, approval date and related stored data.</div></div>
 </section>
 
 <section id="products" class="tab">
@@ -102,6 +104,7 @@
     <div class="actions import-actions">
       <label class="upload compact">Import Product Excel / CSV<input id="importProducts" type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/></label>
       <a class="btn outline link-btn" href="product_import_template.xlsx" download>Download Product Excel Template</a>
+      <button id="loadBundledProducts" class="btn outline" type="button">Load Included Product List</button>
     </div>
     <div class="hint">Existing SKU update rule: Product Code must match. If SKU Name is different, the row is skipped with a warning to prevent a wrong overwrite. New Product Codes are added automatically.</div>
   </div>
@@ -123,7 +126,8 @@
 
 <section id="invoice" class="tab">
   <div class="panel">
-    <h2>New Multi-SKU Invoice</h2>
+    <h2 id="invoiceFormTitle">New Multi-SKU Invoice</h2>
+    <input type="hidden" id="invoiceEditId"/>
     <div class="form-grid">
       <label>Invoice No (Manual)<input id="invNo" placeholder="125478"/></label>
       <label>Date<input id="invDate" type="date"/></label>
@@ -145,9 +149,11 @@
     </div>
     <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Unit</th><th>Cartons</th><th>Pcs/Ctn</th><th>Total Pcs</th><th>Wt/Ctn</th><th>Total Wt</th><th>Tons</th><th>Rate Basis</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceLines"></tbody></table></div>
     <div class="invoice-totals"><div>Total Cartons <b id="invCartons">0</b></div><div>Total Tonnage <b id="invTon">0.000</b></div><div>Grand Total <b id="invTotal">Rs 0</b></div></div>
-    <button id="saveInvoice" class="btn gold wide">Save Invoice</button>
+    <div class="actions"><button id="saveInvoice" class="btn gold wide">Save Invoice</button><button id="cancelInvoiceEdit" class="btn ghost hidden" type="button">Cancel Edit</button></div>
     <div class="invoice-export-box">
-      <h3>Saved Invoice Copy</h3>
+      <h3>Saved Invoice Search / Edit / Export</h3>
+      <div class="form-grid"><label>Search Invoice No<input id="invoiceSearchNo" placeholder="Invoice no"/></label><label>Search Customer<input id="invoiceSearchCustomer" placeholder="Customer code or name"/></label></div>
+      <div id="invoiceSearchResults" class="invoice-search-results"></div>
       <label>Select Invoice<select id="exportInvoice"></select></label>
       <div class="invoice-export-actions">
         <button id="invoicePdf" class="btn gold">Save PDF</button>
@@ -157,6 +163,23 @@
       <div class="hint">Yellow/black professional invoice with SUH logo and watermark.</div>
     </div>
   </div>
+</section>
+
+<section id="scheme" class="tab">
+  <div class="panel">
+    <h2>Scheme / Special Price Offered</h2>
+    <div class="form-grid">
+      <label>Customer<select id="schemeCustomer"></select></label>
+      <label>Product<select id="schemeProduct"></select></label>
+      <label>TP Rate per Pc<input id="schemeTp" type="number" step="0.01" readonly/></label>
+      <label>Scheme Amount (PKR / Pc)<input id="schemeAmount" type="number" step="0.01" min="0"/></label>
+      <label>Special Price<input id="schemeNet" type="number" step="0.01" readonly/></label>
+      <label>Valid From<input id="schemeFrom" type="date"/></label>
+      <label>Valid To<input id="schemeTo" type="date"/></label>
+    </div>
+    <div class="actions"><button id="saveScheme" class="btn gold">Save Scheme</button><button id="schemePdf" class="btn outline">Special Price Offered PDF</button></div>
+  </div>
+  <div class="panel"><div class="section-head"><h2>Saved Schemes</h2><input id="schemeSearch" placeholder="Search customer / SKU"/></div><div id="schemeList"></div></div>
 </section>
 
 <section id="payments" class="tab">

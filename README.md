@@ -15,7 +15,7 @@
 - Company/customer/salesman monthly targets
 - Tonnage and amount target progress
 - Customer/product/salesman/date/status reports
-- CSV export
+- True XLSX Excel export plus PDF/JPG where applicable
 - Customer opening outstanding CSV import
 - Local backup/restore
 - Offline PWA installation
@@ -57,3 +57,14 @@ Data is stored in the browser on the current device. Use **Backup Data** regular
 - Immediate local auto-save plus rolling 7-day auto-backup snapshots, manual backup and restore.
 - Android file picker/download bridge for imports and exported files.
 - Branding line: Made by Shahzad Ul Haq.
+
+
+## Version 6 final additions
+- Included uploaded product list workbook and one-tap/first-run product loading.
+- Saved invoice search by invoice number and customer, with editable invoice records.
+- Scheme module with TP, scheme amount, special price and validity dates.
+- Special Price Offered PDF output.
+- Customer-specific saved-rate/product exports to XLSX and PDF.
+- Invoice header uses SUH beside the logo; watermark uses SUH logo only.
+- Blue SUH stamp plus supplied handwritten signature in the bottom-right Authorized area.
+- Existing customer, product, invoice, payment, return, target, petrol and backup data remain backward compatible.
