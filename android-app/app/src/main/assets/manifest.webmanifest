@@ -1,0 +1,19 @@
+{
+  "name": "SUH Sales Pro",
+  "short_name": "SUH",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070707",
+  "theme_color": "#090909",
+  "description": "Distributor sales, tonnage, outstanding, targets and delivery management.",
+  "icons": [
+    {
+      "src": "assets/suh-final-logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

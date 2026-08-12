@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private val fileChooserRequestCode = 7341
-    private val appUrl = "https://shahzadulhaq765-source.github.io/Sales-Ledger-/"
+    private val appUrl = "file:///android_asset/index.html"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val uri = request.url
-                return if (uri.host == "shahzadulhaq765-source.github.io") false
+                return if (uri.scheme == "file" && uri.path?.startsWith("/android_asset/") == true) false
                 else {
                     startActivity(Intent(Intent.ACTION_VIEW, uri))
                     true

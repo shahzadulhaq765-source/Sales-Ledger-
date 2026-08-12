@@ -1,5 +1,7 @@
 # SUH Sales Pro v6 — Final Implementation Checklist
 
+- Premium animated startup splash added: large SUH logo animated reveal, only `SUH` text, then clean hand-off to the app.
+
 - Existing localStorage database kept backward compatible.
 - Customer records persist; customer saved-rate/product data export added in XLSX and PDF.
 - Uploaded product list workbook is bundled as `product_import_template.xlsx` and can auto-load on an empty product master or be loaded manually.
