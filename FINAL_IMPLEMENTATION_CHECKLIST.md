@@ -1,19 +1,20 @@
-# SUH Sales Pro v6 — Final Implementation Checklist
+# SUH Sales Pro v6.2 Verification Checklist
 
-- Premium animated startup splash added: large SUH logo animated reveal, only `SUH` text, then clean hand-off to the app.
-
-- Existing localStorage database kept backward compatible.
-- Customer records persist; customer saved-rate/product data export added in XLSX and PDF.
-- Uploaded product list workbook is bundled as `product_import_template.xlsx` and can auto-load on an empty product master or be loaded manually.
-- Product TP/TO scheme history remains supported.
-- Invoice search by invoice number and customer added.
-- Saved invoices can be loaded, edited and updated.
-- Invoice PDF/JPG/WhatsApp export retained.
-- Invoice header uses only `SUH` beside logo.
-- Invoice watermark uses the SUH logo only.
-- Supplied blue SUH stamp and handwritten signature are integrated in the bottom-right Authorized area.
-- Scheme module added with customer, product, TP rate, scheme amount, calculated special price, validity dates and saved history.
-- `Special Price Offered` PDF output added.
-- Sales, SSSAP, outstanding and customer exports use true XLSX output where applicable.
-- Existing payments, returns, targets, petrol expense, reports, backup/restore and Android bridge retained.
-- Service worker cache upgraded to v6 and includes new invoice assets/product workbook for offline use.
+- [x] Animated startup screen retained
+- [x] Supplied product workbook bundled unchanged
+- [x] 72 product rows hard-seeded into app startup logic
+- [x] Product TP prices visible in Products master
+- [x] Duplicate source SKU code 5632 retained as two source rows using internal IDs
+- [x] PDF save uses Android native generator
+- [x] JPG save uses Android native generator
+- [x] WhatsApp/share uses Android native PDF generator
+- [x] Signature removed from Authorized area
+- [x] Blue SUH stamp only
+- [x] Transparent light-gray SUH emblem watermark; no square background
+- [x] Discount optional/manual and hidden when zero
+- [x] Any Charges optional/manual and hidden when zero
+- [x] Previous Balance optional/manual and hidden when zero
+- [x] Net Amount calculates entered optional values
+- [x] Web fallback invoice matches Android invoice rules
+- [x] JavaScript syntax checked
+- [x] Product workbook hash matches supplied workbook
