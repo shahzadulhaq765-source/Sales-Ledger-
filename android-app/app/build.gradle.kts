@@ -11,8 +11,8 @@ android {
         applicationId = "com.suh.salespro"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "6.0"
+        versionCode = 7
+        versionName = "6.1"
     }
 
     compileOptions {
