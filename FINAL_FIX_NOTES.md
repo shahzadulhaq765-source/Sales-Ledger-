@@ -1,13 +1,11 @@
-# SUH Sales Pro v6.2 — Final Corrections
+# SUH Sales Pro v6.3 — Dashboard & Watermark Corrections
 
-- Product master now seeds directly from the supplied Excel workbook inside app code, so it does not depend on WebView fetching/parsing the XLSX at startup.
-- All 72 spreadsheet rows are bundled in the seed. The source workbook contains duplicate Product Code 5632 twice; both rows are retained internally with separate IDs while the displayed SKU code stays 5632.
-- TP price, TO scheme, carton size, carton weight/derived weight and unit are populated from the supplied sheet.
-- Invoice Discount, Any Charges and Previous Balance are manual optional fields.
-- If an optional amount is blank or 0, that row is omitted from PDF/JPG/WhatsApp invoice output.
-- If any optional amount is entered, Net Amount is recalculated: Sub Total - Discount + Any Charges + Previous Balance.
-- Without any optional amount, the invoice summary prints only Net Amount.
-- Authorized signature has been removed completely. Only the supplied blue SUH stamp is printed.
-- Watermark is a transparent light-gray SUH emblem extracted from the stamp artwork; no square/white box is used.
-- Android native PDF/JPG/share generator and browser fallback generator use the same invoice rules.
-- Android app version bumped to 6.2 (versionCode 8).
+- Dashboard now includes two large responsive donut charts: Target vs Achievement in Amount and Target vs Achievement in Tonnage.
+- Donut centers show achievement percentage; target, achieved and remaining values are shown with each chart.
+- Charts use the current month's Overall Company target and actual invoice sales/tonnage, updating from saved data.
+- Invoice watermark replaced with a complete SUH stamp-style emblem including the visible stylized S/H mark and SUH text.
+- Watermark is light gray with a transparent background; no white/square box is embedded.
+- Blue Authorized stamp remains separate and no signature is drawn.
+- Optional Discount, Any Charges and Previous Balance remain hidden on exported invoices unless a positive value is entered.
+- Existing hard-seeded 72-row product SKU/TP-price list remains included and versioned for one-time merge.
+- Android app version bumped to 6.3 (versionCode 9).

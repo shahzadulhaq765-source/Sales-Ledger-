@@ -109,6 +109,11 @@ function renderDashboard(){
  $("#targetTonDash").textContent=num(tonTarget)+" tons";
  $("#achievementTonDash").textContent=num(met.tonnage)+" tons";
  $("#achievementTonPct").textContent=tonPct.toFixed(1)+"%";
+ const amountRing=Math.max(0,Math.min(100,amountPct)),tonRing=Math.max(0,Math.min(100,tonPct));
+ if($("#amountAchievementDonut")) $("#amountAchievementDonut").style.setProperty("--pct",amountRing.toFixed(2));
+ if($("#tonnageAchievementDonut")) $("#tonnageAchievementDonut").style.setProperty("--pct",tonRing.toFixed(2));
+ if($("#amountRemainingPct")) $("#amountRemainingPct").textContent=amountTarget?(Math.max(0,100-amountPct)).toFixed(1)+"% remaining":"Target not set";
+ if($("#tonnageRemainingPct")) $("#tonnageRemainingPct").textContent=tonTarget?(Math.max(0,100-tonPct)).toFixed(1)+"% remaining":"Target not set";
  $("#dashTargets").innerHTML=overall?targetProgressHtml("Overall Company",overall,met):'<p class="muted">Set this month’s amount and tonnage target from the Targets page.</p>';
  const byCust={}; monthInv.forEach(i=>{const n=invoiceNet(i);byCust[i.customerCode]??={amount:0,tonnage:0};byCust[i.customerCode].amount+=n.amount;byCust[i.customerCode].tonnage+=n.tonnage});
  $("#topCustomers").innerHTML=Object.entries(byCust).sort((a,b)=>b[1].amount-a[1].amount).slice(0,5).map(([c,m])=>`<div class="statline"><span><b>${esc(cName(c))}</b><div class="muted">${esc(c)}</div></span><span class="right">${money(m.amount)}<div class="muted">${num(m.tonnage)} tons</div></span></div>`).join("")||'<p class="muted">No sales this month.</p>';
@@ -276,7 +281,7 @@ async function invoiceCanvas(inv){
  x.fillStyle="#fff";x.fillRect(0,0,W,H);const yellow="#ffd400",black="#101010",muted="#555";
  const customer=db.customers.find(v=>v.code===inv.customerCode)||{};
  // watermark
- try{const wm=await loadImage("assets/suh-watermark.png");x.save();x.globalAlpha=.52;const mh=650,mw=mh*(wm.width/wm.height);x.drawImage(wm,(W-mw)/2,560,mw,mh);x.restore()}catch(e){}try{const logo=await loadImage("assets/suh-final-logo.png");x.drawImage(logo,85,58,105,105)}catch(e){}
+ try{const wm=await loadImage("assets/suh-watermark.png");x.save();x.globalAlpha=1;const mh=650,mw=mh*(wm.width/wm.height);x.drawImage(wm,(W-mw)/2,560,mw,mh);x.restore()}catch(e){}try{const logo=await loadImage("assets/suh-final-logo.png");x.drawImage(logo,85,58,105,105)}catch(e){}
  x.fillStyle=black;x.font="bold 36px Arial";x.fillText("SUH",215,98);x.font="18px Arial";x.fillText("Sales & Distribution Invoice",215,128);
  x.fillStyle=yellow;x.fillRect(70,185,790,34);x.fillRect(1090,185,80,34);x.fillStyle=black;x.font="bold 38px Arial";x.fillText("INVOICE",895,216);
  x.font="bold 18px Arial";x.fillText("Code:",110,280);x.fillText("Name:",110,316);x.fillText("Address:",110,352);x.font="18px Arial";x.fillText(String(inv.customerCode||""),205,280);x.font="bold 18px Arial";x.fillText(String(customer.name||""),205,316);x.font="16px Arial";x.fillStyle=muted;x.fillText(String(customer.address||"-").slice(0,58),205,352);

@@ -52,13 +52,23 @@
   </div>
   <div class="panel">
     <div class="section-head"><div><h3>Monthly Target & Achievement</h3><div class="muted">Amount and tonnage are tracked separately.</div></div></div>
-    <div class="grid target-cards four">
-      <div class="card target-card"><span>Monthly Target — Amount</span><strong id="targetAmountDash">Rs 0</strong></div>
-      <div class="card target-card"><span>Achievement — Amount</span><strong id="achievementAmountDash">Rs 0</strong><em id="achievementAmountPct">0.0%</em></div>
-      <div class="card target-card"><span>Monthly Target — Tonnage</span><strong id="targetTonDash">0.000 tons</strong></div>
-      <div class="card target-card"><span>Achievement — Tonnage</span><strong id="achievementTonDash">0.000 tons</strong><em id="achievementTonPct">0.0%</em></div>
+    <div class="achievement-donuts">
+      <div class="achievement-widget">
+        <div class="donut-title">Target vs Achievement — Amount</div>
+        <div id="amountAchievementDonut" class="achievement-donut" style="--pct:0">
+          <div class="donut-center"><span>Achievement</span><strong id="achievementAmountPct">0.0%</strong><small id="amountRemainingPct">100.0% remaining</small></div>
+        </div>
+        <div class="donut-metrics"><div><span>Target</span><b id="targetAmountDash">Rs 0</b></div><div><span>Achieved</span><b id="achievementAmountDash">Rs 0</b></div></div>
+      </div>
+      <div class="achievement-widget">
+        <div class="donut-title">Target vs Achievement — Tonnage</div>
+        <div id="tonnageAchievementDonut" class="achievement-donut" style="--pct:0">
+          <div class="donut-center"><span>Achievement</span><strong id="achievementTonPct">0.0%</strong><small id="tonnageRemainingPct">100.0% remaining</small></div>
+        </div>
+        <div class="donut-metrics"><div><span>Target</span><b id="targetTonDash">0.000 tons</b></div><div><span>Achieved</span><b id="achievementTonDash">0.000 tons</b></div></div>
+      </div>
     </div>
-    <div id="dashTargets"></div>
+    <div id="dashTargets" class="target-detail"></div>
   </div>
   <div class="panel"><h3>Delivery Status</h3><div id="deliverySummary"></div></div>
   <div class="grid two">

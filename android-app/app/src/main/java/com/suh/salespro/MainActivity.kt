@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
 
         val watermark = assetBitmap("assets/suh-watermark.png")
         watermark?.let {
-            p.alpha = 118
+            p.alpha = 255
             val mh = 650f
             val mw = mh * (it.width.toFloat() / it.height.toFloat())
             c.drawBitmap(it, null, RectF((w-mw)/2f, 545f, (w+mw)/2f, 545f+mh), p)
