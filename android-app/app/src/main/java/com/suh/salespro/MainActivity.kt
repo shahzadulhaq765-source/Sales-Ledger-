@@ -118,6 +118,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun shareGmailBase64(fileName: String, mimeType: String, base64Data: String) {
+            Thread {
+                try { shareBytesToGmail(fileName, mimeType, Base64.decode(base64Data, Base64.DEFAULT)) }
+                catch (_: Exception) { uiToast("Could not share with Gmail") }
+            }.start()
+        }
+
+        @JavascriptInterface
         fun saveInvoicePdf(invoiceJson: String) {
             Thread {
                 try {
@@ -269,6 +277,27 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread {
             try { startActivity(Intent.createChooser(intent, "Share invoice")) }
             catch (_: Exception) { Toast.makeText(this, "No sharing app available", Toast.LENGTH_SHORT).show() }
+        }
+    }
+
+    private fun shareBytesToGmail(fileName: String, mimeType: String, bytes: ByteArray) {
+        val folder = File(cacheDir, "shared").apply { mkdirs() }
+        val file = File(folder, fileName); FileOutputStream(file).use { it.write(bytes) }
+        val uri = FileProvider.getUriForFile(this, packageName + ".fileprovider", file)
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = mimeType
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, fileName.removeSuffix(".xlsx"))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            setPackage("com.google.android.gm")
+        }
+        runOnUiThread {
+            try { startActivity(intent) }
+            catch (_: Exception) {
+                val fallback = Intent(Intent.ACTION_SEND).apply { type=mimeType; putExtra(Intent.EXTRA_STREAM,uri); addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                try { startActivity(Intent.createChooser(fallback, "Share by email")) }
+                catch (_: Exception) { Toast.makeText(this, "Gmail/email app not available", Toast.LENGTH_SHORT).show() }
+            }
         }
     }
 

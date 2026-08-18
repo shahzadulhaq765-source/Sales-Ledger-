@@ -94,11 +94,20 @@
       <label>Target Amount (PKR)<input id="ddTargetAmount" type="number" step="0.01"/></label><label>Target Tonnage<input id="ddTargetTon" type="number" step="0.001"/></label>
     </div><div class="actions"><button id="saveDashboardTarget" class="btn gold">Save / Update Monthly Target</button><label class="upload compact">Import Dashboard Excel / CSV<input id="importDashboardData" type="file" accept=".xlsx,.csv"/></label></div>
   </div>
-  <div class="panel"><h2>Add Achievement</h2><div class="form-grid">
+  <div class="panel"><h2>Achievement</h2>
+    <div class="form-grid">
+      <label>Achievement in Amount (PKR)<input id="ddAchievementAmount" type="number" min="0" step="0.01"/></label>
+      <label>Achievement in Tonnage<input id="ddAchievementTon" type="number" min="0" step="0.001"/></label>
+    </div>
+    <div class="actions"><button id="saveMonthlyAchievement" class="btn gold">Save Achievement</button><button id="updateMonthlyAchievement" class="btn outline">Update Achievement</button></div>
+    <div id="ddAchievementStatus" class="hint"></div>
+  </div>
+  <div class="section-divider"><span>Customer / Product Achievement Details</span></div>
+  <div class="panel"><h2>Detailed Achievement Entry</h2><div class="form-grid">
     <label>Date<input id="ddAchDate" type="date"/></label><label>Customer Name<select id="ddCustomer"></select></label><label>Customer Code<input id="ddCustomerCode" readonly/></label>
     <label>Product SKU<select id="ddProduct"></select></label><label>Product Name<input id="ddProductName" readonly/></label><label>Packaging Size<input id="ddPacking" readonly/></label>
     <label>Carton Weight<input id="ddWeight" readonly/></label><label>Unit<input id="ddUnit" readonly/></label><label>TP Amount<input id="ddTp" readonly/></label><label>No. of Cartons<input id="ddCartons" type="number" min="0" step="1"/></label>
-  </div><div id="ddPreview" class="hint"></div><div class="actions"><button id="saveDashboardAchievement" class="btn gold">Add Achievement</button><button id="ddInsertSku" class="btn outline">Insert New SKU</button></div></div>
+  </div><div id="ddPreview" class="hint"></div><div class="actions"><button id="saveDashboardAchievement" class="btn gold">Save Detail Entry</button><button id="ddInsertSku" class="btn outline">Insert New SKU</button></div></div>
   <div class="panel"><div class="section-head"><h2>Dashboard Data History</h2><div id="ddLastUpdate" class="muted"></div></div><div id="dashboardDataList"></div></div>
 </section>
 <section id="customers" class="tab">
@@ -293,8 +302,11 @@
  <div class="panel"><div class="section-head"><h2>Saved Outstanding</h2><input id="outstandingSearch" placeholder="Search invoice, customer, area"/></div><div id="outstandingSavedSummary"></div><div id="outstandingSavedList"></div></div>
 </section>
 <section id="broadway" class="tab">
- <div class="panel"><h2>Broadway Pizza Export</h2><div class="form-grid"><label>Month<input id="bpMonth" type="month"/></label><label>From Date<input id="bpFrom" type="date"/></label><label>To Date<input id="bpTo" type="date"/></label></div>
- <div class="actions"><button id="bpPreviewBtn" class="btn outline">Preview</button><button id="bpExcelBtn" class="btn gold">Export Excel</button><button id="bpWhatsappBtn" class="btn gold">Share WhatsApp</button></div><div id="bpSummary" class="hint"></div><div id="bpPreview" class="table-wrap"></div></div>
+ <div class="panel"><h2>Broadway Pizza Outstanding</h2><div class="muted">Import the Atlas invoice-wise outstanding PDF/Excel here, filter by month/date, preview every invoice, then export or share the final one-sheet report.</div>
+ <div class="actions"><label class="upload compact">Import Broadway PDF / Excel<input id="bpImportFile" type="file" accept=".xlsx,.csv,.pdf"/></label><button id="bpClearImport" class="btn ghost">Clear Imported Preview</button></div>
+ <div id="bpImportStatus" class="hint"></div>
+ <div class="form-grid"><label>Month<input id="bpMonth" type="month"/></label><label>From Date<input id="bpFrom" type="date"/></label><label>To Date<input id="bpTo" type="date"/></label></div>
+ <div class="actions"><button id="bpPreviewBtn" class="btn outline">Preview</button><button id="bpExcelBtn" class="btn gold">Export Excel</button><button id="bpWhatsappBtn" class="btn gold">Share WhatsApp</button><button id="bpGmailBtn" class="btn outline">Share Gmail</button></div><div id="bpSummary" class="hint"></div><div id="bpPreview" class="table-wrap"></div></div>
 </section>
 <section id="reports" class="tab">
   <div class="panel">
