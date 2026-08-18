@@ -11,11 +11,23 @@
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body class="splash-active">
-<div id="startupSplash" class="startup-splash" aria-label="SUH starting screen">
+<div id="startupSplash" class="startup-splash warehouse-splash" aria-label="SUH starting screen">
+  <div class="warehouse-grid"></div><div class="energy-floor"></div><div class="energy-ring"></div>
   <div class="splash-glow"></div>
   <div class="splash-mark"><img src="assets/suh-final-logo.png" alt="SUH"/></div>
   <div class="splash-name">SUH</div>
-  <div class="splash-line"></div>
+  <div class="splash-tagline">SALES • DISTRIBUTION • GROWTH</div>
+  <div class="splash-features"><span>Distribution</span><span>Sales Tracking</span><span>Outstanding</span><span>Reports</span></div>
+  <div class="splash-line"></div><div class="splash-final">TRACK • MANAGE • GROW</div>
+</div>
+<div id="ayatSplash" class="ayat-splash" aria-label="Ayat screen">
+  <div class="ayat-sky"></div><div class="ayat-card">
+    <div class="ayat-kicker">سورۃ الطلاق • آیات 2–3</div>
+    <div id="ayatArabic" class="ayat-arabic"></div>
+    <div class="ayat-divider"></div>
+    <div id="ayatUrdu" class="ayat-urdu"></div>
+    <div id="ayatReadHint" class="ayat-read-hint">پڑھنے کے لیے چند لمحے</div>
+  </div>
 </div>
 <header class="topbar">
   <div class="brand"><div class="logo"><img src="assets/suh-final-logo.png" alt="SUH logo"/></div><div><h1>SUH Sales Pro</h1><p>Distributor Sales Management</p><p class="made-by">Made by Shahzad Ul Haq</p></div></div>
@@ -24,6 +36,7 @@
 
 <nav class="tabs">
   <button data-tab="dashboard" class="active">Dashboard</button>
+  <button data-tab="dashboardData">Dashboard Data</button>
   <button data-tab="customers">Customers</button>
   <button data-tab="products">Products</button>
   <button data-tab="salesmen">Salesmen</button>
@@ -31,8 +44,9 @@
   <button data-tab="scheme">Scheme</button>
   <button data-tab="payments">Payments</button>
   <button data-tab="returns">Returns</button>
-  <button data-tab="targets">Targets</button>
   <button data-tab="petrol">Petrol Expense</button>
+  <button data-tab="outstandingImport">Invoice-wise Outstanding</button>
+  <button data-tab="broadway">Broadway Pizza</button>
   <button data-tab="reports">Reports</button>
 </nav>
 
@@ -58,26 +72,35 @@
         <div id="amountAchievementDonut" class="achievement-donut" style="--pct:0">
           <div class="donut-center"><span>Achievement</span><strong id="achievementAmountPct">0.0%</strong><small id="amountRemainingPct">100.0% remaining</small></div>
         </div>
-        <div class="donut-metrics"><div><span>Target</span><b id="targetAmountDash">Rs 0</b></div><div><span>Achieved</span><b id="achievementAmountDash">Rs 0</b></div></div>
+        <div class="donut-metrics three"><div><span>Target</span><b id="targetAmountDash">Rs 0</b></div><div><span>Achieved</span><b id="achievementAmountDash">Rs 0</b></div><div><span>Remaining</span><b id="remainingAmountDash">Rs 0</b></div></div>
       </div>
       <div class="achievement-widget">
         <div class="donut-title">Target vs Achievement — Tonnage</div>
         <div id="tonnageAchievementDonut" class="achievement-donut" style="--pct:0">
           <div class="donut-center"><span>Achievement</span><strong id="achievementTonPct">0.0%</strong><small id="tonnageRemainingPct">100.0% remaining</small></div>
         </div>
-        <div class="donut-metrics"><div><span>Target</span><b id="targetTonDash">0.000 tons</b></div><div><span>Achieved</span><b id="achievementTonDash">0.000 tons</b></div></div>
+        <div class="donut-metrics three"><div><span>Target</span><b id="targetTonDash">0.000 tons</b></div><div><span>Achieved</span><b id="achievementTonDash">0.000 tons</b></div><div><span>Remaining</span><b id="remainingTonDash">0.000 tons</b></div></div>
       </div>
     </div>
     <div id="dashTargets" class="target-detail"></div>
   </div>
-  <div class="panel"><h3>Delivery Status</h3><div id="deliverySummary"></div></div>
-  <div class="grid two">
-    <div class="panel"><h3>Top Customers</h3><div id="topCustomers"></div></div>
-    <div class="panel"><h3>Top Products</h3><div id="topProducts"></div></div>
-  </div>
-  <div class="panel"><h3>Recent Invoices</h3><div id="recentInvoices"></div></div>
+  <div class="panel"><div class="section-head"><h3>Dashboard Data Status</h3><button class="btn outline" onclick="switchTab('dashboardData')">Manage Dashboard Data</button></div><div id="dashboardDataStatus" class="muted"></div></div>
 </section>
 
+<section id="dashboardData" class="tab">
+  <div class="panel"><div class="section-head"><div><h2>Dashboard Data</h2><div class="muted">Single source for Target, Achievement and Remaining — Amount & Tonnage.</div></div><button id="recalcDashboard" class="btn outline">Recalculate Dashboard</button></div>
+    <div class="form-grid">
+      <label>Month<input id="ddMonth" type="month"/></label><label>Effective From<input id="ddEffective" type="date"/></label>
+      <label>Target Amount (PKR)<input id="ddTargetAmount" type="number" step="0.01"/></label><label>Target Tonnage<input id="ddTargetTon" type="number" step="0.001"/></label>
+    </div><div class="actions"><button id="saveDashboardTarget" class="btn gold">Save / Update Monthly Target</button><label class="upload compact">Import Dashboard Excel / CSV<input id="importDashboardData" type="file" accept=".xlsx,.csv"/></label></div>
+  </div>
+  <div class="panel"><h2>Add Achievement</h2><div class="form-grid">
+    <label>Date<input id="ddAchDate" type="date"/></label><label>Customer Name<select id="ddCustomer"></select></label><label>Customer Code<input id="ddCustomerCode" readonly/></label>
+    <label>Product SKU<select id="ddProduct"></select></label><label>Product Name<input id="ddProductName" readonly/></label><label>Packaging Size<input id="ddPacking" readonly/></label>
+    <label>Carton Weight<input id="ddWeight" readonly/></label><label>Unit<input id="ddUnit" readonly/></label><label>TP Amount<input id="ddTp" readonly/></label><label>No. of Cartons<input id="ddCartons" type="number" min="0" step="1"/></label>
+  </div><div id="ddPreview" class="hint"></div><div class="actions"><button id="saveDashboardAchievement" class="btn gold">Add Achievement</button><button id="ddInsertSku" class="btn outline">Insert New SKU</button></div></div>
+  <div class="panel"><div class="section-head"><h2>Dashboard Data History</h2><div id="ddLastUpdate" class="muted"></div></div><div id="dashboardDataList"></div></div>
+</section>
 <section id="customers" class="tab">
   <div class="panel">
     <h2>Customer Master</h2>
@@ -264,6 +287,15 @@
   </div>
 </section>
 
+<section id="outstandingImport" class="tab">
+ <div class="panel"><h2>Invoice-wise Outstanding</h2><div class="muted">Import Atlas-style invoice-wise outstanding reports. Excel/CSV is fully parsed; text-based PDF reports are parsed when their text stream is readable.</div>
+ <div class="actions"><label class="upload compact">Import Excel / CSV / PDF<input id="importOutstandingFile" type="file" accept=".xlsx,.csv,.pdf"/></label><button id="clearOutstandingPreview" class="btn ghost">Clear Preview</button></div><div id="outstandingImportSummary" class="hint"></div><div id="outstandingPreview" class="table-wrap"></div><div class="actions"><button id="commitOutstandingImport" class="btn gold">Save / Update Preview</button></div></div>
+ <div class="panel"><div class="section-head"><h2>Saved Outstanding</h2><input id="outstandingSearch" placeholder="Search invoice, customer, area"/></div><div id="outstandingSavedSummary"></div><div id="outstandingSavedList"></div></div>
+</section>
+<section id="broadway" class="tab">
+ <div class="panel"><h2>Broadway Pizza Export</h2><div class="form-grid"><label>Month<input id="bpMonth" type="month"/></label><label>From Date<input id="bpFrom" type="date"/></label><label>To Date<input id="bpTo" type="date"/></label></div>
+ <div class="actions"><button id="bpPreviewBtn" class="btn outline">Preview</button><button id="bpExcelBtn" class="btn gold">Export Excel</button><button id="bpWhatsappBtn" class="btn gold">Share WhatsApp</button></div><div id="bpSummary" class="hint"></div><div id="bpPreview" class="table-wrap"></div></div>
+</section>
 <section id="reports" class="tab">
   <div class="panel">
     <h2>Reports & Ledger</h2>
